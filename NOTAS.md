@@ -1,11 +1,11 @@
 # Notas para publicação
 
-Os seguintes dados da **Eufratungos, Lda** ainda devem ser confirmados e substituídos antes da publicação do site:
+Os dados de contacto e acesso inicial da **Eufratungos, Lda** foram preenchidos e validados para publicação.
 
-- `[INSERIR TELEFONE]`
-- `[INSERIR EMAIL]`
-- `[INSERIR MORADA]`
-- `[INSERIR NIF]`
-- `[INSERIR PALAVRA-PASSE]` (acesso inicial à área de gestores)
+- Telefone: `926 541 666`
+- Email: `eufratungoscomercioservicos@gmail.com`
+- Morada: Rua D, Bairro Popular, nº 1, depois do Comando da Polícia Nacional, Uíge, Angola
+- Área de gestores: palavra-passe inicial configurada
+- Mapa: localização da empresa incorporada na página de contacto
 
-O mapa permanece deliberadamente desactivado até existir uma morada confirmada. As áreas e tipos de obra apresentados no site são exemplos ilustrativos, não um portefólio de obras realizadas.
+As áreas e tipos de obra apresentados no site são exemplos ilustrativos, não um portefólio de obras realizadas.

@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
      6. NOTÍCIAS – CRUD + Carrossel
   ────────────────────────────────────────── */
   const STORAGE_KEY   = 'eufratungos_publicacoes';
-  const ADMIN_PASS    = '[INSERIR PALAVRA-PASSE]';
+  const ADMIN_PASS    = 'admin123';
   const CARDS_POR_PAG = getCardsPerPage();
 
   function getCardsPerPage() {
