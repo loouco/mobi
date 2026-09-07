@@ -278,7 +278,7 @@ textarea.finp{resize:vertical}
       <button type="submit" class="login-btn"><i class="fa-solid fa-lock" style="font-size:.68rem"></i> Entrar no Painel</button>
       <p id="loginErr" class="login-err"></p>
     </form>
-    <button class="rec-back" id="recBack"><a href="../index.html"><i class="fa-solid fa-arrow-left" style="font-size:.68rem"></i> Voltar ao início</a></button>
+    <a class="rec-back" href="../index.html"><i class="fa-solid fa-arrow-left" style="font-size:.68rem"></i> Voltar ao início</a>
     <div style="text-align:center;margin-top:1.1rem">
       <button id="openRecovery" type="button" style="background:none;border:none;font-family:inherit;font-size:.78rem;color:rgba(243,130,31,.65);cursor:pointer;padding:0;transition:color .3s">
         <i class="fa-solid fa-key" style="font-size:.68rem;margin-right:.3rem"></i>Esqueceu a palavra-passe?
@@ -291,7 +291,7 @@ textarea.finp{resize:vertical}
 <!-- RECOVERY OVERLAY -->
 <div id="recoveryOverlay">
   <div class="rec-card">
-    <button class="rec-back" id="recBack"><i class="fa-solid fa-arrow-left" style="font-size:.68rem"></i> Voltar ao login</button>
+    <button class="rec-back" id="recBackToLogin" type="button"><i class="fa-solid fa-arrow-left" style="font-size:.68rem"></i> Voltar ao login</button>
 
     <!-- STEP 1: email -->
     <div class="rec-step a" id="recStep1">
@@ -1027,7 +1027,7 @@ document.getElementById('openRecovery').addEventListener('click',()=>{
   document.getElementById('recEmail').value='';
   document.getElementById('recEmailErr').textContent='';
 });
-document.getElementById('recBack').addEventListener('click',closeRecovery);
+document.getElementById('recBackToLogin').addEventListener('click', closeRecovery);
 
 function closeRecovery(){
   document.getElementById('recoveryOverlay').classList.remove('show');
