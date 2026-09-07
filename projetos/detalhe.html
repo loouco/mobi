@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/js/supabase-config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Áreas e Tipos de Obra – Eufratungos, Lda</title>
@@ -209,12 +211,10 @@ footer .back:hover{color:#fff}
 <script>
 /* =====================================================
    EUFRATUNGOS, LDA – projetos/detalhe.html
-   Chave localStorage: eufratungos_projects
+   Dados dinâmicos via Supabase (tabela: projects)
    ===================================================== */
 (()=>{
 'use strict';
-
-const KEY='eufratungos_projects';
 
 const DEF=[
   {id:'p1',titulo:'Fornecimento e logística',categoria:'comercio',local:'Exemplo ilustrativo',ano:'—',dim:'Comércio geral',desc:'Exemplo ilustrativo de fornecimento de materiais e apoio logístico; não representa uma obra ou contrato realizado pela Eufratungos.',img:'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80'},
@@ -223,8 +223,18 @@ const DEF=[
 ];
 
 const catLabel={comercio:'Comércio Geral',construcao:'Construção Civil','obras-publicas':'Obras Públicas'};
-const load=()=>{try{const v=localStorage.getItem(KEY);return(v?JSON.parse(v):null)||DEF;}catch{return DEF;}};
-if(!localStorage.getItem(KEY))localStorage.setItem(KEY,JSON.stringify(DEF));
+
+// ── CACHE EM MEMÓRIA (preenchida a partir do Supabase) ──
+let projectsCache=DEF;
+const load=()=>projectsCache;
+
+async function carregarDados(){
+  try{
+    const p=await EufraDB.list('projects');
+    if(p && p.length) projectsCache=p.map(x=>({...x,desc:x.descricao||x.desc}));
+  }catch(e){ console.error('Falha ao carregar dados do Supabase, a usar dados padrão.', e); }
+  renderProjects();
+}
 
 // REVEAL
 const rObs=new IntersectionObserver(es=>es.forEach(e=>{
@@ -300,7 +310,7 @@ md.addEventListener('click',e=>{if(e.target===md)closeM();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&md.classList.contains('o'))closeM();});
 
 // INIT
-renderProjects();
+carregarDados();
 
 })();
 </script>

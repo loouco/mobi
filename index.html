@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/js/supabase-config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eufratungos, Lda – Comércio, Serviços, Construção e Obras Públicas</title>
@@ -654,19 +656,12 @@ footer .bottom p{font-size:.75rem}
 <script>
 /* =====================================================
    Eufratungos ENGENHARIA – index.html
-   Chaves localStorage unificadas:
-     eufratungos_news      → notícias
-     eufratungos_projects  → projetos
-     eufratungos_ads       → publicidades
-     eufratungos_ads_imgs  → imagens das publicidades (base64)
+   Dados dinâmicos via Supabase (tabelas: news, projects, ads)
    ===================================================== */
 (function(){
 'use strict';
 
-// ── CHAVES UNIFICADAS ──────────────────────────────────
-const KEYS={news:'eufratungos_news',projects:'eufratungos_projects',ads:'eufratungos_ads',adsImgs:'eufratungos_ads_imgs'};
-
-// ── DADOS PADRÃO ───────────────────────────────────────
+// ── DADOS PADRÃO (usados só se a base estiver vazia/offline) ──
 const DEF_NEWS=[
   {id:'n1',titulo:'Bem-vindo ao novo site da Eufratungos',resumo:'Este espaço será actualizado com informações institucionais e novidades verificadas da empresa.',content:'Bem-vindo ao site da Eufratungos, Lda. As notícias e actualizações publicadas neste espaço serão adicionadas à medida que exista informação institucional confirmada.',categoria:'Institucional',data:'',img:'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=70'},
 ];
@@ -677,17 +672,19 @@ const DEF_PROJECTS=[
   {id:'p3',titulo:'Infraestrutura e obras públicas',categoria:'obras-publicas',local:'Exemplo ilustrativo',ano:'—',dim:'Obras públicas',desc:'Exemplo ilustrativo de infraestrutura ou obra pública; não representa uma obra realizada pela Eufratungos.',img:'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1200&q=80'},
 ];
 
-const DEF_ADS=[];
-
-// ── STORAGE ────────────────────────────────────────────
-const load=(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}};
-const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
+// ── CACHE EM MEMÓRIA (preenchida a partir do Supabase) ──
+let newsCache=DEF_NEWS, projectsCache=DEF_PROJECTS;
 const fmtDate=s=>{try{return new Date(s).toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});}catch{return s||'';}};
 
-// Inicializar dados padrão se não existirem
-if(!localStorage.getItem(KEYS.news))save(KEYS.news,DEF_NEWS);
-if(!localStorage.getItem(KEYS.projects))save(KEYS.projects,DEF_PROJECTS);
-if(!localStorage.getItem(KEYS.ads))save(KEYS.ads,DEF_ADS);
+async function carregarDados(){
+  try{
+    const [n,p]=await Promise.all([EufraDB.list('news'),EufraDB.list('projects')]);
+    if(n && n.length) newsCache=n.map(x=>({...x,desc:x.descricao||x.desc}));
+    if(p && p.length) projectsCache=p.map(x=>({...x,desc:x.descricao||x.desc}));
+  }catch(e){ console.error('Falha ao carregar dados do Supabase, a usar dados padrão.', e); }
+  renderProjects();
+  buildCarousel();
+}
 
 // ── SCROLL PROGRESS + HEADER ──────────────────────────
 const prog=document.getElementById('scroll-progress');
@@ -722,7 +719,7 @@ document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 const catLabel={comercio:'Comércio Geral',construcao:'Construção Civil','obras-publicas':'Obras Públicas'};
 
 function renderProjects(){
-  const projs=load(KEYS.projects,DEF_PROJECTS);
+  const projs=projectsCache;
   const grid=document.getElementById('projectsGrid');
   grid.innerHTML=projs.slice(0,3).map((p,i)=>`
     <div class="project-card reveal" style="transition-delay:${i*.1}s"
@@ -745,7 +742,6 @@ function renderProjects(){
     ro.observe(c);
   });
 }
-renderProjects();
 
 // ── FILTROS (redirecionam para detalhe.html) ───────────
 document.querySelectorAll('.filter-btn').forEach(btn=>btn.addEventListener('click',()=>{
@@ -778,7 +774,7 @@ const saEl=document.getElementById('slide-atual');
 const stEl=document.getElementById('slide-total');
 
 function buildCarousel(){
-  const news=load(KEYS.news,DEF_NEWS);
+  const news=newsCache;
   if(!news.length){
     track.innerHTML='<div style="padding:3rem;color:#aaa;text-align:center;font-size:.9rem">Sem publicações de momento.</div>';
     return;
@@ -803,7 +799,7 @@ function buildCarousel(){
 }
 
 function goTo(i,anim=true){
-  const news=load(KEYS.news,DEF_NEWS);
+  const news=newsCache;
   const n=news.length;if(!n)return;
   ci=(i%n+n)%n;
   if(!anim)track.style.transition='none';
@@ -822,7 +818,7 @@ let ap=setInterval(()=>goTo(ci+1),6000);
 [document.getElementById('noticias-prev'),document.getElementById('noticias-next')].forEach(b=>{
   b.addEventListener('click',()=>{clearInterval(ap);ap=setInterval(()=>goTo(ci+1),6000);});
 });
-buildCarousel();
+carregarDados();
 
 // ── FORMULÁRIO CONTACTO ───────────────────────────────
 document.getElementById('formulario-contacto')?.addEventListener('submit',function(e){

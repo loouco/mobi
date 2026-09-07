@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/js/supabase-config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestores – Eufratungos, Lda</title>
@@ -270,6 +272,8 @@ textarea.finp{resize:vertical}
     <h1 class="login-title">Área Restrita</h1>
     <p class="login-sub">Acesso exclusivo para gestores autorizados da Eufratungos Comércio, Serviços, Construção e Obras Públicas.</p>
     <form id="loginForm">
+      <label for="loginEmail" class="login-lbl">Email</label>
+      <input type="email" id="loginEmail" class="login-inp" placeholder="Introduza o seu email" autocomplete="username" style="margin-bottom:.9rem">
       <label for="loginPW" class="login-lbl">Palavra-passe</label>
       <div class="pw-wrap">
         <input type="password" id="loginPW" class="login-inp" placeholder="Introduza a sua senha" autocomplete="current-password">
@@ -284,7 +288,6 @@ textarea.finp{resize:vertical}
         <i class="fa-solid fa-key" style="font-size:.68rem;margin-right:.3rem"></i>Esqueceu a palavra-passe?
       </button>
     </div>
-    <p class="login-hint">Palavra-passe por omissão: <strong style="color:rgba(255,255,255,.5)">admin123</strong></p>
   </div>
 </div>
 
@@ -296,41 +299,19 @@ textarea.finp{resize:vertical}
     <!-- STEP 1: email -->
     <div class="rec-step a" id="recStep1">
       <div class="rec-title">Recuperar Acesso</div>
-      <p class="rec-sub">Introduza o email associado à conta de gestor para receber um código de verificação.</p>
+      <p class="rec-sub">Introduza o email associado à conta de gestor para receber uma ligação de recuperação.</p>
       <label class="login-lbl" for="recEmail">Email de gestor</label>
       <input type="email" id="recEmail" class="login-inp" placeholder="eufratungoscomercioservicos@gmail.com" autocomplete="email">
       <button type="button" id="recSendCode" class="login-btn" style="margin-top:1rem">
-        <i class="fa-solid fa-paper-plane" style="font-size:.68rem"></i> Enviar código
+        <i class="fa-solid fa-paper-plane" style="font-size:.68rem"></i> Enviar ligação de recuperação
       </button>
       <p class="rec-msg bad" id="recEmailErr" style="margin-top:.6rem"></p>
     </div>
 
-    <!-- STEP 2: código OTP -->
-    <div class="rec-step" id="recStep2">
-      <div class="rec-title">Verificar Código</div>
-      <p class="rec-sub" id="recStep2Sub">Introduza o código de 6 dígitos enviado para o seu email.</p>
-      <div class="rec-code-wrap" id="recCodeWrap">
-        <input type="text" maxlength="1" inputmode="numeric" class="rec-digit">
-        <input type="text" maxlength="1" inputmode="numeric" class="rec-digit">
-        <input type="text" maxlength="1" inputmode="numeric" class="rec-digit">
-        <input type="text" maxlength="1" inputmode="numeric" class="rec-digit">
-        <input type="text" maxlength="1" inputmode="numeric" class="rec-digit">
-        <input type="text" maxlength="1" inputmode="numeric" class="rec-digit">
-      </div>
-      <p class="rec-msg" id="recCodeMsg"></p>
-      <button type="button" id="recVerifyCode" class="login-btn" style="margin-top:1rem">
-        <i class="fa-solid fa-check" style="font-size:.68rem"></i> Verificar código
-      </button>
-      <button type="button" class="rec-resend" id="recResend" disabled>
-        <i class="fa-solid fa-rotate-right" style="font-size:.65rem"></i>
-        <span>Reenviar em <span id="recCountdown">60</span>s</span>
-      </button>
-    </div>
-
-    <!-- STEP 3: nova senha -->
+    <!-- STEP 3: nova senha (mostrado quando se chega através da ligação recebida por email) -->
     <div class="rec-step" id="recStep3">
       <div class="rec-title">Nova Palavra-passe</div>
-      <p class="rec-sub">Código verificado. Defina agora uma nova palavra-passe para a conta.</p>
+      <p class="rec-sub">Defina agora uma nova palavra-passe para a conta.</p>
       <div class="auth-fields">
         <div>
           <label class="login-lbl" for="recNewPW">Nova palavra-passe</label>
@@ -612,32 +593,16 @@ textarea.finp{resize:vertical}
 
 <script>
 /* =====================================================
-   EUFRATUNGOS, LDA - gestores.html
-   Chaves localStorage:
-     eufratungos_news      noticias
-     eufratungos_projects  projetos
-     eufratungos_ads       publicidades
-     eufratungos_ads_imgs  imagens publicidades (base64)
-     eufratungos_auth      { pw, email, lastLogin }
+   EUFRATUNGOS, LDA - gestores/index.html
+   Autenticação: Supabase Auth (email + palavra-passe)
+   Dados: Supabase (tabelas news, ads, projects) + Storage (bucket 'imagens')
    ===================================================== */
 (()=>{
 'use strict';
 
-/* ── CHAVES ─────────────────────────────────────────── */
-const SESSION_KEY='eufratungos_adm';
-const AUTH_KEY='eufratungos_auth';
-const KEYS={news:'eufratungos_news',projects:'eufratungos_projects',ads:'eufratungos_ads',adsImgs:'eufratungos_ads_imgs'};
-const DEFAULT_PW='admin123';
+/* ── DADOS EM MEMÓRIA (carregados do Supabase) ─────── */
+let newsData=[], adsData=[], projectsData=[];
 
-/* ── AUTH HELPERS ───────────────────────────────────── */
-function getAuth(){
-  try{return JSON.parse(localStorage.getItem(AUTH_KEY))||{pw:DEFAULT_PW,email:'',lastLogin:''};}
-  catch{return{pw:DEFAULT_PW,email:'',lastLogin:''};}
-}
-function saveAuth(obj){localStorage.setItem(AUTH_KEY,JSON.stringify(obj));}
-function currentPW(){return getAuth().pw||DEFAULT_PW;}
-
-/* ── STORAGE ────────────────────────────────────────── */
 const DEF_IMG=[
   'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=60',
   'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=400&q=60',
@@ -645,20 +610,7 @@ const DEF_IMG=[
   'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=60',
 ];
 const catLabel={comercio:'Comércio Geral',construcao:'Construção Civil','obras-publicas':'Obras Públicas'};
-const get=k=>{try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}};
-const getObj=k=>{try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}};
-const set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const fD=s=>{try{return new Date(s).toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});}catch{return s||'';}};
-
-/* Seed de dados */
-const DEF_ADS=[];
-const DEF_PROJECTS=[
-  {id:'p1',titulo:'Fornecimento e logística',categoria:'comercio',local:'Exemplo ilustrativo',ano:'—',dim:'Comércio geral',desc:'Exemplo ilustrativo de fornecimento de materiais e apoio logístico; não representa uma obra ou contrato realizado pela Eufratungos.',img:'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80'},
-  {id:'p2',titulo:'Construção e reabilitação civil',categoria:'construcao',local:'Exemplo ilustrativo',ano:'—',dim:'Construção civil',desc:'Exemplo ilustrativo de intervenção de construção ou reabilitação; não representa uma obra realizada pela Eufratungos.',img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80'},
-  {id:'p3',titulo:'Infraestrutura e obras públicas',categoria:'obras-publicas',local:'Exemplo ilustrativo',ano:'—',dim:'Obras públicas',desc:'Exemplo ilustrativo de infraestrutura ou obra pública; não representa uma obra realizada pela Eufratungos.',img:'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1200&q=80'},
-];
-if(!localStorage.getItem(KEYS.ads))set(KEYS.ads,DEF_ADS);
-if(!localStorage.getItem(KEYS.projects))set(KEYS.projects,DEF_PROJECTS);
 
 /* ── TOAST ──────────────────────────────────────────── */
 let toastTimer;
@@ -713,27 +665,34 @@ function renderStrength(pw,fillId,labelId){
 document.getElementById('settingsNewPW').addEventListener('input',e=>renderStrength(e.target.value,'settingsStrFill','settingsStrLabel'));
 document.getElementById('recNewPW').addEventListener('input',e=>renderStrength(e.target.value,'recStrFill','recStrLabel'));
 
-/* ── AUTH LOGIN ─────────────────────────────────────── */
-function checkAuth(){if(sessionStorage.getItem(SESSION_KEY)==='1')showDashboard();}
+/* ── AUTH LOGIN ──────────────────────────────────────── */
+async function checkAuth(){
+  const session=await EufraAuth.getSession();
+  if(session) await showDashboard(session);
+}
 
-document.getElementById('loginForm').addEventListener('submit',e=>{
+document.getElementById('loginForm').addEventListener('submit', async e=>{
   e.preventDefault();
+  const email=document.getElementById('loginEmail').value.trim();
   const pw=document.getElementById('loginPW').value;
   const err=document.getElementById('loginErr');
-  if(pw===currentPW()){
-    sessionStorage.setItem(SESSION_KEY,'1');
-    const auth=getAuth();auth.lastLogin=new Date().toISOString();saveAuth(auth);
-    err.textContent='';
-    document.getElementById('loginPW').value='';
-    showDashboard();
-  }else{
-    err.textContent='Palavra-passe incorreta. Tente novamente.';
+  const btn=document.querySelector('#loginForm button[type="submit"]');
+  err.textContent='';
+  if(!email||!pw){err.textContent='Introduza email e palavra-passe.';return;}
+  btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> A entrar...';
+  const {data,error}=await EufraAuth.signIn(email,pw);
+  btn.disabled=false;btn.innerHTML=orig;
+  if(error){
+    err.textContent='Email ou palavra-passe incorretos.';
     document.getElementById('loginPW').select();
+    return;
   }
+  document.getElementById('loginPW').value='';
+  await showDashboard(data.session);
 });
 
 function logout(){
-  sessionStorage.removeItem(SESSION_KEY);
+  EufraAuth.signOut();
   document.getElementById('dashboard').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('gone');
   document.getElementById('loginPW').value='';
@@ -742,13 +701,72 @@ function logout(){
 document.getElementById('sidebarOut').addEventListener('click',logout);
 document.getElementById('topbarOut').addEventListener('click',logout);
 
-function showDashboard(){
+async function showDashboard(session){
   document.getElementById('loginScreen').classList.add('gone');
   document.getElementById('dashboard').classList.add('show');
-  const auth=getAuth();
-  document.getElementById('sbEmail').textContent=auth.email||'sem email configurado';
+  document.getElementById('sbEmail').textContent=session?.user?.email||'sem email configurado';
+  await carregarDados();
   renderAll();
 }
+
+/* ── RECUPERAÇÃO DE PALAVRA-PASSE (email real via Supabase) ── */
+function goRecStep(n){
+  [1,3].forEach(i=>document.getElementById('recStep'+i).classList.toggle('a',i===n));
+}
+function closeRecovery(){
+  document.getElementById('recoveryOverlay').classList.remove('show');
+}
+document.getElementById('openRecovery').addEventListener('click',()=>{
+  goRecStep(1);
+  document.getElementById('recoveryOverlay').classList.add('show');
+  document.getElementById('recEmail').value='';
+  document.getElementById('recEmailErr').textContent='';
+  document.getElementById('recEmailErr').classList.remove('ok');
+});
+document.getElementById('recBackToLogin').addEventListener('click', closeRecovery);
+
+document.getElementById('recSendCode').addEventListener('click', async ()=>{
+  const email=document.getElementById('recEmail').value.trim();
+  const errEl=document.getElementById('recEmailErr');
+  errEl.classList.remove('ok');
+  errEl.textContent='';
+  if(!email||!email.includes('@')){errEl.textContent='Introduza um email válido.';return;}
+  const redirectTo=location.origin+location.pathname;
+  const {error}=await EufraAuth.sendPasswordReset(email,redirectTo);
+  if(error){errEl.textContent='Não foi possível enviar o email de recuperação.';return;}
+  errEl.classList.add('ok');
+  errEl.textContent='Email enviado! Verifique a sua caixa de entrada e clique na ligação para definir uma nova palavra-passe.';
+});
+
+/* Quando o utilizador chega através da ligação do email, o Supabase
+   dispara o evento PASSWORD_RECOVERY automaticamente. */
+EufraAuth.onAuthStateChange((event)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    document.getElementById('loginScreen').classList.add('gone');
+    document.getElementById('recoveryOverlay').classList.add('show');
+    document.getElementById('recNewPW').value='';
+    document.getElementById('recConfirmPW').value='';
+    document.getElementById('recPWMsg').textContent='';
+    document.getElementById('recPWMsg').className='rec-msg';
+    renderStrength('','recStrFill','recStrLabel');
+    goRecStep(3);
+  }
+});
+
+document.getElementById('recSavePW').addEventListener('click', async ()=>{
+  const nw=document.getElementById('recNewPW').value;
+  const cf=document.getElementById('recConfirmPW').value;
+  const msgEl=document.getElementById('recPWMsg');
+  msgEl.className='rec-msg';
+  if(nw.length<6){msgEl.textContent='A senha precisa de ter pelo menos 6 caracteres.';msgEl.classList.add('bad');return;}
+  if(nw!==cf){msgEl.textContent='As senhas não coincidem.';msgEl.classList.add('bad');return;}
+  const {error}=await EufraAuth.updatePassword(nw);
+  if(error){msgEl.textContent='Erro ao actualizar a senha.';msgEl.classList.add('bad');return;}
+  msgEl.textContent='Palavra-passe actualizada com sucesso!';
+  msgEl.classList.add('ok');
+  toast('Palavra-passe actualizada com sucesso.');
+  setTimeout(async()=>{closeRecovery();await checkAuth();},1800);
+});
 
 /* ── NAVIGATION ─────────────────────────────────────── */
 const panels=['overview','noticias','publicidades','projetos','settings'];
@@ -764,17 +782,28 @@ function switchPanel(name){
 }
 document.querySelectorAll('[data-panel]').forEach(el=>el.addEventListener('click',()=>switchPanel(el.dataset.panel)));
 
+/* ── CARREGAR DADOS ─────────────────────────────────── */
+async function carregarDados(){
+  try{
+    const [n,a,p]=await Promise.all([EufraDB.list('news'),EufraDB.list('ads'),EufraDB.list('projects')]);
+    newsData=n||[];adsData=a||[];projectsData=p||[];
+  }catch(e){
+    console.error(e);
+    toast('Não foi possível carregar os dados do servidor.',true);
+  }
+}
+
 /* ── RENDER ALL ─────────────────────────────────────── */
 function renderAll(){renderOverview();renderNewsList();renderAdsList();renderProjectsList();updateBadges();}
 function updateBadges(){
-  document.getElementById('sbBadgeN').textContent=get(KEYS.news).length;
-  document.getElementById('sbBadgeA').textContent=get(KEYS.ads).length;
-  document.getElementById('sbBadgeP').textContent=get(KEYS.projects).length;
+  document.getElementById('sbBadgeN').textContent=newsData.length;
+  document.getElementById('sbBadgeA').textContent=adsData.length;
+  document.getElementById('sbBadgeP').textContent=projectsData.length;
 }
 
 /* ── OVERVIEW ───────────────────────────────────────── */
 function renderOverview(){
-  const n=get(KEYS.news),a=get(KEYS.ads),p=get(KEYS.projects);
+  const n=newsData,a=adsData,p=projectsData;
   document.getElementById('statsRow').innerHTML=`
     <div class="stat-card"><div class="stat-ic n"><i class="fa-solid fa-newspaper"></i></div><div><div class="stat-val">${n.length}</div><div class="stat-lbl">Notícias</div></div></div>
     <div class="stat-card"><div class="stat-ic a"><i class="fa-solid fa-bullhorn"></i></div><div><div class="stat-val">${a.length}</div><div class="stat-lbl">Publicidades</div></div></div>
@@ -789,11 +818,11 @@ function renderOverview(){
       <div class="item-info"><div class="item-title">${item.titulo}</div><div class="item-meta"><span class="item-tag">${item.categoria}</span>${fD(item.data)}</div></div>
       <div class="item-actions"><div class="ia-btn" onclick="editNews('${item.id}')"><i class="fa-solid fa-pen"></i></div></div>
     </div>`).join('');
-  const ra=document.getElementById('recentAds'),aimgs=getObj(KEYS.adsImgs);
+  const ra=document.getElementById('recentAds');
   if(!a.length){ra.innerHTML='<div class="empty-state"><i class="fa-solid fa-bullhorn"></i><p>Sem publicidades</p></div>';}
   else ra.innerHTML=a.slice(0,4).map((item,i)=>`
     <div class="item-row">
-      <img class="item-thumb" src="${aimgs[item.id]||DEF_IMG[i%4]}" alt="" onerror="this.src='${DEF_IMG[i%4]}'">
+      <img class="item-thumb" src="${item.img||DEF_IMG[i%4]}" alt="" onerror="this.src='${DEF_IMG[i%4]}'">
       <div class="item-info"><div class="item-title">${item.titulo}</div><div class="item-meta"><span class="item-tag">${item.categoria}</span>${item.preco||'—'}</div></div>
       <div class="item-actions"><div class="ia-btn" onclick="editAd('${item.id}')"><i class="fa-solid fa-pen"></i></div></div>
     </div>`).join('');
@@ -801,7 +830,7 @@ function renderOverview(){
 
 /* ── NOTÍCIAS CRUD ──────────────────────────────────── */
 function renderNewsList(){
-  const data=get(KEYS.news),el=document.getElementById('nList');
+  const data=newsData,el=document.getElementById('nList');
   if(!data.length){el.innerHTML='<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>Sem notícias cadastradas.</p></div>';return;}
   el.innerHTML=data.map((n,i)=>`
     <div class="item-row">
@@ -814,6 +843,7 @@ function renderNewsList(){
     </div>`).join('');
 }
 document.getElementById('nSave').addEventListener('click',async()=>{
+  const btn=document.getElementById('nSave');
   const id=document.getElementById('nId').value;
   const tit=document.getElementById('nTit').value.trim();
   const res=document.getElementById('nRes').value.trim();
@@ -822,16 +852,28 @@ document.getElementById('nSave').addEventListener('click',async()=>{
   const dat=document.getElementById('nData').value||new Date().toISOString().slice(0,10);
   const fi=document.getElementById('nImg');
   if(!tit||!res||!cont)return toast('Preencha os campos obrigatórios (*)',true);
-  const img=fi.files[0]?await toB64(fi.files[0]):null;
-  const data=get(KEYS.news);
-  if(id){const x=data.findIndex(n=>String(n.id)===id);if(x>-1){data[x]={...data[x],titulo:tit,resumo:res,content:cont,categoria:cat,data:dat};if(img)data[x].img=img;}}
-  else data.unshift({id:'n'+Date.now(),titulo:tit,resumo:res,content:cont,categoria:cat,img:img||'',data:dat});
-  set(KEYS.news,data);resetNewsForm();renderNewsList();renderOverview();updateBadges();
-  toast(id?'Notícia actualizada com sucesso.':'Notícia publicada com sucesso.');
+  btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i> A guardar...';
+  try{
+    let img=null;
+    if(fi.files[0])img=await EufraDB.uploadImagem(fi.files[0]);
+    if(id){
+      const payload={titulo:tit,resumo:res,content:cont,categoria:cat,data:dat};
+      if(img)payload.img=img;
+      const updated=await EufraDB.update('news',id,payload);
+      const idx=newsData.findIndex(n=>String(n.id)===String(id));
+      if(idx>-1)newsData[idx]=updated;
+    }else{
+      const created=await EufraDB.insert('news',{titulo:tit,resumo:res,content:cont,categoria:cat,img:img||'',data:dat});
+      newsData.unshift(created);
+    }
+    resetNewsForm();renderNewsList();renderOverview();updateBadges();
+    toast(id?'Notícia actualizada com sucesso.':'Notícia publicada com sucesso.');
+  }catch(e){toast('Erro ao guardar a notícia.',true);}
+  finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk mr-2"></i> Guardar publicação';}
 });
 document.getElementById('nCan').addEventListener('click',resetNewsForm);
 window.editNews=function(id){
-  const n=get(KEYS.news).find(x=>String(x.id)===String(id));if(!n)return;
+  const n=newsData.find(x=>String(x.id)===String(id));if(!n)return;
   document.getElementById('nId').value=n.id;
   document.getElementById('nTit').value=n.titulo;
   document.getElementById('nRes').value=n.resumo;
@@ -843,10 +885,13 @@ window.editNews=function(id){
   switchPanel('noticias');
   document.getElementById('nTit').scrollIntoView({behavior:'smooth',block:'center'});
 };
-window.deleteNews=function(id){
+window.deleteNews=async function(id){
   if(!confirm('Eliminar notícia?'))return;
-  set(KEYS.news,get(KEYS.news).filter(x=>String(x.id)!==String(id)));
-  renderNewsList();renderOverview();updateBadges();toast('Notícia eliminada.');
+  try{
+    await EufraDB.remove('news',id);
+    newsData=newsData.filter(x=>String(x.id)!==String(id));
+    renderNewsList();renderOverview();updateBadges();toast('Notícia eliminada.');
+  }catch(e){toast('Erro ao eliminar a notícia.',true);}
 };
 function resetNewsForm(){
   document.getElementById('nId').value='';
@@ -859,11 +904,11 @@ function resetNewsForm(){
 
 /* ── PUBLICIDADES CRUD ──────────────────────────────── */
 function renderAdsList(){
-  const data=get(KEYS.ads),imgs=getObj(KEYS.adsImgs),el=document.getElementById('aList');
+  const data=adsData,el=document.getElementById('aList');
   if(!data.length){el.innerHTML='<div class="empty-state"><i class="fa-solid fa-bullhorn"></i><p>Sem publicidades cadastradas.</p></div>';return;}
   el.innerHTML=data.map((a,i)=>`
     <div class="item-row">
-      <img class="item-thumb" src="${imgs[a.id]||DEF_IMG[i%4]}" alt="" onerror="this.src='${DEF_IMG[i%4]}'">
+      <img class="item-thumb" src="${a.img||DEF_IMG[i%4]}" alt="" onerror="this.src='${DEF_IMG[i%4]}'">
       <div class="item-info"><div class="item-title">${a.titulo}</div><div class="item-meta"><span class="item-tag">${a.categoria}</span>${a.preco||'Sob consulta'}</div></div>
       <div class="item-actions">
         <div class="ia-btn" onclick="editAd('${a.id}')"><i class="fa-solid fa-pen"></i></div>
@@ -872,6 +917,7 @@ function renderAdsList(){
     </div>`).join('');
 }
 document.getElementById('aSave').addEventListener('click',async()=>{
+  const btn=document.getElementById('aSave');
   const id=document.getElementById('aId').value;
   const tit=document.getElementById('aTit').value.trim();
   const desc=document.getElementById('aDesc').value.trim();
@@ -880,16 +926,28 @@ document.getElementById('aSave').addEventListener('click',async()=>{
   const cont=document.getElementById('aContact').value.trim();
   const fi=document.getElementById('aImg');
   if(!tit||!desc)return toast('Preencha os campos obrigatórios (*)',true);
-  const img=fi.files[0]?await toB64(fi.files[0]):null;
-  const data=get(KEYS.ads),imgs=getObj(KEYS.adsImgs);
-  if(id){const x=data.findIndex(a=>String(a.id)===id);if(x>-1){data[x]={...data[x],titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont};if(img)imgs[data[x].id]=img;}}
-  else{const nid='a'+Date.now();data.unshift({id:nid,titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont,data:new Date().toISOString().slice(0,10)});if(img)imgs[nid]=img;}
-  set(KEYS.ads,data);set(KEYS.adsImgs,imgs);resetAdForm();renderAdsList();renderOverview();updateBadges();
-  toast(id?'Publicidade actualizada.':'Publicidade criada.');
+  btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i> A guardar...';
+  try{
+    let img=null;
+    if(fi.files[0])img=await EufraDB.uploadImagem(fi.files[0]);
+    if(id){
+      const payload={titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont};
+      if(img)payload.img=img;
+      const updated=await EufraDB.update('ads',id,payload);
+      const idx=adsData.findIndex(a=>String(a.id)===String(id));
+      if(idx>-1)adsData[idx]=updated;
+    }else{
+      const created=await EufraDB.insert('ads',{titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont,img:img||'',data:new Date().toISOString().slice(0,10)});
+      adsData.unshift(created);
+    }
+    resetAdForm();renderAdsList();renderOverview();updateBadges();
+    toast(id?'Publicidade actualizada.':'Publicidade criada.');
+  }catch(e){toast('Erro ao guardar a publicidade.',true);}
+  finally{btn.disabled=false;btn.innerHTML=orig;}
 });
 document.getElementById('aCan').addEventListener('click',resetAdForm);
 window.editAd=function(id){
-  const a=get(KEYS.ads).find(x=>String(x.id)===String(id));if(!a)return;
+  const a=adsData.find(x=>String(x.id)===String(id));if(!a)return;
   document.getElementById('aId').value=a.id;
   document.getElementById('aTit').value=a.titulo;
   document.getElementById('aDesc').value=a.descricao;
@@ -901,11 +959,13 @@ window.editAd=function(id){
   switchPanel('publicidades');
   document.getElementById('aTit').scrollIntoView({behavior:'smooth',block:'center'});
 };
-window.deleteAd=function(id){
+window.deleteAd=async function(id){
   if(!confirm('Eliminar publicidade?'))return;
-  const imgs=getObj(KEYS.adsImgs);delete imgs[id];set(KEYS.adsImgs,imgs);
-  set(KEYS.ads,get(KEYS.ads).filter(x=>String(x.id)!==String(id)));
-  renderAdsList();renderOverview();updateBadges();toast('Publicidade eliminada.');
+  try{
+    await EufraDB.remove('ads',id);
+    adsData=adsData.filter(x=>String(x.id)!==String(id));
+    renderAdsList();renderOverview();updateBadges();toast('Publicidade eliminada.');
+  }catch(e){toast('Erro ao eliminar a publicidade.',true);}
 };
 function resetAdForm(){
   document.getElementById('aId').value='';
@@ -917,7 +977,7 @@ function resetAdForm(){
 
 /* ── PROJETOS CRUD ──────────────────────────────────── */
 function renderProjectsList(){
-  const data=get(KEYS.projects),el=document.getElementById('pList');
+  const data=projectsData,el=document.getElementById('pList');
   if(!data.length){el.innerHTML='<div class="empty-state"><i class="fa-solid fa-building"></i><p>Sem projetos cadastrados.</p></div>';return;}
   el.innerHTML=data.map((p,i)=>`
     <div class="item-row">
@@ -930,6 +990,7 @@ function renderProjectsList(){
     </div>`).join('');
 }
 document.getElementById('pSave').addEventListener('click',async()=>{
+  const btn=document.getElementById('pSave');
   const id=document.getElementById('pId').value;
   const tit=document.getElementById('pTit').value.trim();
   const desc=document.getElementById('pDesc').value.trim();
@@ -939,19 +1000,31 @@ document.getElementById('pSave').addEventListener('click',async()=>{
   const dim=document.getElementById('pDim').value.trim();
   const fi=document.getElementById('pImg');
   if(!tit||!desc)return toast('Preencha os campos obrigatórios (*)',true);
-  const img=fi.files[0]?await toB64(fi.files[0]):null;
-  const data=get(KEYS.projects);
-  if(id){const x=data.findIndex(p=>String(p.id)===id);if(x>-1){data[x]={...data[x],titulo:tit,descricao:desc,desc:desc,categoria:cat,ano,local:loc,dim};if(img)data[x].img=img;}}
-  else data.unshift({id:'p'+Date.now(),titulo:tit,descricao:desc,desc:desc,categoria:cat,ano,local:loc,dim,img:img||''});
-  set(KEYS.projects,data);resetProjectForm();renderProjectsList();renderOverview();updateBadges();
-  toast(id?'Projeto actualizado.':'Projeto adicionado ao portefólio.');
+  btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i> A guardar...';
+  try{
+    let img=null;
+    if(fi.files[0])img=await EufraDB.uploadImagem(fi.files[0]);
+    if(id){
+      const payload={titulo:tit,descricao:desc,categoria:cat,ano,local:loc,dim};
+      if(img)payload.img=img;
+      const updated=await EufraDB.update('projects',id,payload);
+      const idx=projectsData.findIndex(p=>String(p.id)===String(id));
+      if(idx>-1)projectsData[idx]=updated;
+    }else{
+      const created=await EufraDB.insert('projects',{titulo:tit,descricao:desc,categoria:cat,ano,local:loc,dim,img:img||''});
+      projectsData.unshift(created);
+    }
+    resetProjectForm();renderProjectsList();renderOverview();updateBadges();
+    toast(id?'Projeto actualizado.':'Projeto adicionado ao portefólio.');
+  }catch(e){toast('Erro ao guardar o projeto.',true);}
+  finally{btn.disabled=false;btn.innerHTML=orig;}
 });
 document.getElementById('pCan').addEventListener('click',resetProjectForm);
 window.editProject=function(id){
-  const p=get(KEYS.projects).find(x=>String(x.id)===String(id));if(!p)return;
+  const p=projectsData.find(x=>String(x.id)===String(id));if(!p)return;
   document.getElementById('pId').value=p.id;
   document.getElementById('pTit').value=p.titulo;
-  document.getElementById('pDesc').value=p.descricao||p.desc||'';
+  document.getElementById('pDesc').value=p.descricao||'';
   document.getElementById('pCat').value=p.categoria;
   document.getElementById('pAno').value=p.ano||'';
   document.getElementById('pLoc').value=p.local||'';
@@ -961,10 +1034,13 @@ window.editProject=function(id){
   switchPanel('projetos');
   document.getElementById('pTit').scrollIntoView({behavior:'smooth',block:'center'});
 };
-window.deleteProject=function(id){
+window.deleteProject=async function(id){
   if(!confirm('Eliminar projeto?'))return;
-  set(KEYS.projects,get(KEYS.projects).filter(x=>String(x.id)!==String(id)));
-  renderProjectsList();renderOverview();updateBadges();toast('Projeto eliminado.');
+  try{
+    await EufraDB.remove('projects',id);
+    projectsData=projectsData.filter(x=>String(x.id)!==String(id));
+    renderProjectsList();renderOverview();updateBadges();toast('Projeto eliminado.');
+  }catch(e){toast('Erro ao eliminar o projeto.',true);}
 };
 function resetProjectForm(){
   document.getElementById('pId').value='';
@@ -975,11 +1051,12 @@ function resetProjectForm(){
 }
 
 /* ── PAINEL DE DEFINIÇÕES ───────────────────────────── */
-function loadSettingsPanel(){
-  const auth=getAuth();
-  document.getElementById('settingsEmail').value=auth.email||'';
-  document.getElementById('settingsEmailDisplay').textContent=auth.email||'—';
-  document.getElementById('settingsLastLogin').textContent=auth.lastLogin?fD(auth.lastLogin):'—';
+async function loadSettingsPanel(){
+  const session=await EufraAuth.getSession();
+  const email=session?.user?.email||'';
+  document.getElementById('settingsEmail').value=email;
+  document.getElementById('settingsEmailDisplay').textContent=email||'—';
+  document.getElementById('settingsLastLogin').textContent=session?.user?.last_sign_in_at?fD(session.user.last_sign_in_at):'—';
   document.getElementById('settingsOldPW').value='';
   document.getElementById('settingsNewPW').value='';
   document.getElementById('settingsConfirmPW').value='';
@@ -988,192 +1065,40 @@ function loadSettingsPanel(){
 }
 
 /* Guardar email */
-document.getElementById('saveEmail').addEventListener('click',()=>{
+document.getElementById('saveEmail').addEventListener('click',async()=>{
   const email=document.getElementById('settingsEmail').value.trim();
   if(!email||!email.includes('@'))return toast('Introduza um endereço de email válido.',true);
-  const auth=getAuth();auth.email=email;saveAuth(auth);
+  const {error}=await EufraAuth.updateEmail(email);
+  if(error)return toast('Não foi possível actualizar o email.',true);
   document.getElementById('settingsEmailDisplay').textContent=email;
   document.getElementById('sbEmail').textContent=email;
-  toast('Email de recuperação guardado com sucesso.');
+  toast('Pedido de alteração de email enviado. Poderá ser necessário confirmar através do link enviado para o novo endereço.');
 });
 
-/* Alterar senha */
-document.getElementById('savePW').addEventListener('click',()=>{
+/* Alterar senha (reconfirma a senha atual através de um novo login) */
+document.getElementById('savePW').addEventListener('click',async()=>{
   const errEl=document.getElementById('settingsPWErr');
   const old=document.getElementById('settingsOldPW').value;
   const nw=document.getElementById('settingsNewPW').value;
   const cf=document.getElementById('settingsConfirmPW').value;
   errEl.classList.add('hid');
 
-  if(old!==currentPW()){errEl.textContent='A palavra-passe atual está incorreta.';errEl.classList.remove('hid');return;}
+  const session=await EufraAuth.getSession();
+  const email=session?.user?.email;
+  if(!old){errEl.textContent='Introduza a palavra-passe atual.';errEl.classList.remove('hid');return;}
+  const {error:signInErr}=await EufraAuth.signIn(email,old);
+  if(signInErr){errEl.textContent='A palavra-passe atual está incorreta.';errEl.classList.remove('hid');return;}
   if(nw.length<6){errEl.textContent='A nova senha precisa de ter pelo menos 6 caracteres.';errEl.classList.remove('hid');return;}
   if(nw!==cf){errEl.textContent='As senhas não coincidem.';errEl.classList.remove('hid');return;}
 
-  const auth=getAuth();auth.pw=nw;saveAuth(auth);
+  const {error}=await EufraAuth.updatePassword(nw);
+  if(error){errEl.textContent='Não foi possível actualizar a palavra-passe.';errEl.classList.remove('hid');return;}
   document.getElementById('settingsOldPW').value='';
   document.getElementById('settingsNewPW').value='';
   document.getElementById('settingsConfirmPW').value='';
   renderStrength('','settingsStrFill','settingsStrLabel');
   toast('Palavra-passe actualizada com sucesso.');
 });
-
-/* ── RECUPERAÇÃO POR EMAIL (OTP simulado) ───────────── */
-const OTP_KEY='eufratungos_otp'; // { code, email, expires }
-let countdownTimer=null;
-
-document.getElementById('openRecovery').addEventListener('click',()=>{
-  goRecStep(1);
-  document.getElementById('recoveryOverlay').classList.add('show');
-  document.getElementById('recEmail').value='';
-  document.getElementById('recEmailErr').textContent='';
-});
-document.getElementById('recBackToLogin').addEventListener('click', closeRecovery);
-
-function closeRecovery(){
-  document.getElementById('recoveryOverlay').classList.remove('show');
-  clearInterval(countdownTimer);
-  localStorage.removeItem(OTP_KEY);
-}
-
-function goRecStep(n){
-  [1,2,3].forEach(i=>document.getElementById('recStep'+i).classList.toggle('a',i===n));
-}
-
-/* STEP 1 – enviar código */
-document.getElementById('recSendCode').addEventListener('click',()=>{
-  const email=document.getElementById('recEmail').value.trim();
-  const errEl=document.getElementById('recEmailErr');
-  errEl.textContent='';
-
-  if(!email||!email.includes('@')){errEl.textContent='Introduza um email válido.';return;}
-
-  const auth=getAuth();
-  if(auth.email&&email.toLowerCase()!==auth.email.toLowerCase()){
-    errEl.textContent='Este email não corresponde ao email de recuperação registado.';return;
-  }
-  if(!auth.email){
-    errEl.textContent='Sem email de recuperação configurado. Configure-o nas Definições de Acesso após entrar.';return;
-  }
-
-  /* Gera código OTP de 6 dígitos e guarda com TTL de 10 min */
-  const code=String(Math.floor(100000+Math.random()*900000));
-  const expires=Date.now()+10*60*1000;
-  localStorage.setItem(OTP_KEY,JSON.stringify({code,email:email.toLowerCase(),expires}));
-
-  /* Num site real, o código seria enviado por email via API.
-     Aqui mostramos via toast para demonstração. */
-  toast('Código de verificação: ' + code + '  (válido 10 min)');
-
-  /* Actualiza texto do passo 2 */
-  const masked=email.replace(/(.{2}).+(@.+)/,'$1•••$2');
-  document.getElementById('recStep2Sub').textContent='Introduza o código de 6 dígitos enviado para '+masked+'. Válido por 10 minutos.';
-
-  /* Limpa campos de dígitos */
-  document.querySelectorAll('.rec-digit').forEach(d=>{d.value='';d.classList.remove('ok','bad');});
-  document.getElementById('recCodeMsg').textContent='';
-  document.getElementById('recCodeMsg').className='rec-msg';
-  goRecStep(2);
-  document.querySelectorAll('.rec-digit')[0].focus();
-  startCountdown();
-});
-
-/* Navegação entre dígitos OTP */
-document.querySelectorAll('.rec-digit').forEach((inp,i,all)=>{
-  inp.addEventListener('input',e=>{
-    inp.value=e.data&&/\d/.test(e.data)?e.data:'';
-    if(inp.value&&i<all.length-1)all[i+1].focus();
-  });
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Backspace'&&!inp.value&&i>0)all[i-1].focus();
-    if(e.key==='ArrowLeft'&&i>0)all[i-1].focus();
-    if(e.key==='ArrowRight'&&i<all.length-1)all[i+1].focus();
-  });
-  inp.addEventListener('paste',e=>{
-    e.preventDefault();
-    const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
-    txt.split('').forEach((ch,j)=>{if(all[j])all[j].value=ch;});
-    if(all[Math.min(txt.length,5)])all[Math.min(txt.length,5)].focus();
-  });
-});
-
-/* STEP 2 – verificar código */
-document.getElementById('recVerifyCode').addEventListener('click',()=>{
-  const entered=Array.from(document.querySelectorAll('.rec-digit')).map(d=>d.value).join('');
-  const msgEl=document.getElementById('recCodeMsg');
-  const stored=JSON.parse(localStorage.getItem(OTP_KEY)||'null');
-
-  if(!stored||Date.now()>stored.expires){
-    msgEl.textContent='Código expirado. Clique em reenviar.';
-    msgEl.className='rec-msg bad';
-    document.querySelectorAll('.rec-digit').forEach(d=>d.classList.add('bad'));
-    return;
-  }
-  if(entered!==stored.code){
-    msgEl.textContent='Código incorreto. Tente novamente.';
-    msgEl.className='rec-msg bad';
-    document.querySelectorAll('.rec-digit').forEach(d=>d.classList.add('bad'));
-    setTimeout(()=>{
-      document.querySelectorAll('.rec-digit').forEach(d=>{d.classList.remove('bad');d.value='';});
-      document.querySelectorAll('.rec-digit')[0].focus();
-    },900);
-    return;
-  }
-  /* Código correto */
-  document.querySelectorAll('.rec-digit').forEach(d=>d.classList.add('ok'));
-  msgEl.textContent='Código verificado!';
-  msgEl.className='rec-msg ok';
-  clearInterval(countdownTimer);
-  localStorage.removeItem(OTP_KEY);
-  setTimeout(()=>{
-    document.getElementById('recNewPW').value='';
-    document.getElementById('recConfirmPW').value='';
-    document.getElementById('recPWMsg').textContent='';
-    document.getElementById('recPWMsg').className='rec-msg';
-    renderStrength('','recStrFill','recStrLabel');
-    goRecStep(3);
-  },700);
-});
-
-/* Reenviar */
-document.getElementById('recResend').addEventListener('click',function(){
-  if(this.disabled)return;
-  /* Simula novo envio reaproveitando o email já digitado */
-  document.getElementById('recSendCode').click.call(document.getElementById('recSendCode'));
-  /* Na prática voltaria ao step1; aqui reiniciamos só o countdown */
-  startCountdown();
-});
-
-function startCountdown(){
-  clearInterval(countdownTimer);
-  let t=60;
-  const btn=document.getElementById('recResend');
-  const cd=document.getElementById('recCountdown');
-  btn.disabled=true;cd.textContent=t;
-  countdownTimer=setInterval(()=>{
-    t--;cd.textContent=t;
-    if(t<=0){clearInterval(countdownTimer);btn.disabled=false;cd.textContent=60;}
-  },1000);
-}
-
-/* STEP 3 – guardar nova senha */
-document.getElementById('recSavePW').addEventListener('click',()=>{
-  const nw=document.getElementById('recNewPW').value;
-  const cf=document.getElementById('recConfirmPW').value;
-  const msgEl=document.getElementById('recPWMsg');
-  msgEl.className='rec-msg';
-
-  if(nw.length<6){msgEl.textContent='A senha precisa de ter pelo menos 6 caracteres.';msgEl.classList.add('bad');return;}
-  if(nw!==cf){msgEl.textContent='As senhas não coincidem.';msgEl.classList.add('bad');return;}
-
-  const auth=getAuth();auth.pw=nw;saveAuth(auth);
-  msgEl.textContent='Palavra-passe actualizada com sucesso!';
-  msgEl.classList.add('ok');
-  toast('Palavra-passe recuperada com sucesso. Pode fazer login.');
-  setTimeout(closeRecovery,1800);
-});
-
-/* ── HELPERS ────────────────────────────────────────── */
-function toB64(file){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(file);});}
 
 /* ── INIT ───────────────────────────────────────────── */
 document.getElementById('nData').value=new Date().toISOString().slice(0,10);

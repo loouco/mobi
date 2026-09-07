@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../assets/js/supabase-config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notícias – Eufratungos, Lda</title>
@@ -313,15 +315,10 @@ footer .back:hover{color:#fff}
 <script>
 /* =====================================================
    EUFRATUNGOS, LDA – noticias/show.html
-   Chaves localStorage unificadas:
-     eufratungos_news     → notícias
-     eufratungos_ads      → publicidades
-     eufratungos_ads_imgs → imagens publicidades (base64)
+   Dados dinâmicos via Supabase (tabelas: news, ads)
    ===================================================== */
 (()=>{
 'use strict';
-
-const KEYS={news:'eufratungos_news',ads:'eufratungos_ads',adsImgs:'eufratungos_ads_imgs'};
 
 const DEF_NEWS=[
   {id:'n1',titulo:'Bem-vindo ao novo site da Eufratungos',resumo:'Este espaço receberá informações institucionais e novidades verificadas da empresa.',content:'Bem-vindo ao site da Eufratungos, Lda. As notícias serão adicionadas à medida que exista informação institucional confirmada.',categoria:'Institucional',data:'',img:'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=70'},
@@ -335,13 +332,22 @@ const DEF_IMG_FALLBACKS=[
   'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=800&q=70',
 ];
 
-const lN=()=>{try{return JSON.parse(localStorage.getItem(KEYS.news))||DEF_NEWS;}catch{return DEF_NEWS;}};
-const lA=()=>{try{return JSON.parse(localStorage.getItem(KEYS.ads))||DEF_ADS;}catch{return DEF_ADS;}};
-const lAI=()=>{try{return JSON.parse(localStorage.getItem(KEYS.adsImgs))||{};}catch{return{};}};
+// ── CACHE EM MEMÓRIA (preenchida a partir do Supabase) ──
+let newsCache=DEF_NEWS, adsCache=DEF_ADS;
+const lN=()=>newsCache;
+const lA=()=>adsCache;
+const lAI=()=>{ const m={}; adsCache.forEach(a=>{ if(a.img) m[a.id]=a.img; }); return m; };
 const fD=s=>{try{return new Date(s).toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});}catch{return s||'';}};
 
-if(!localStorage.getItem(KEYS.news))localStorage.setItem(KEYS.news,JSON.stringify(DEF_NEWS));
-if(!localStorage.getItem(KEYS.ads))localStorage.setItem(KEYS.ads,JSON.stringify(DEF_ADS));
+async function carregarDados(){
+  try{
+    const [n,a]=await Promise.all([EufraDB.list('news'),EufraDB.list('ads')]);
+    if(n && n.length) newsCache=n;
+    if(a) adsCache=a.map(x=>({...x,descricao:x.descricao||x.desc}));
+  }catch(e){ console.error('Falha ao carregar dados do Supabase, a usar dados padrão.', e); }
+  renderNews();
+  renderAds();
+}
 
 // ── REVEAL ──────────────────────────────────────────
 const rObs=new IntersectionObserver(es=>es.forEach(e=>{
@@ -517,9 +523,7 @@ document.getElementById('adModal').addEventListener('click',e=>{if(e.target===do
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('adModal').classList.remove('o');document.body.style.overflow='';}});
 
 // ── INIT ─────────────────────────────────────────────
-renderNews();
-// pré-renderizar ads em background para imagens carregarem
-renderAds();
+carregarDados();
 
 })();
 </script>
