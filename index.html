@@ -673,14 +673,15 @@ const DEF_PROJECTS=[
 ];
 
 // ── CACHE EM MEMÓRIA (preenchida a partir do Supabase) ──
-let newsCache=DEF_NEWS, projectsCache=DEF_PROJECTS;
+let newsCache=DEF_NEWS, projectsCache=DEF_PROJECTS, adsCache=[];
 const fmtDate=s=>{try{return new Date(s).toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});}catch{return s||'';}};
 
 async function carregarDados(){
   try{
-    const [n,p]=await Promise.all([EufraDB.list('news'),EufraDB.list('projects')]);
+    const [n,p,a]=await Promise.all([EufraDB.list('news'),EufraDB.list('projects'),EufraDB.list('ads')]);
     if(n && n.length) newsCache=n.map(x=>({...x,desc:x.descricao||x.desc}));
     if(p && p.length) projectsCache=p.map(x=>({...x,desc:x.descricao||x.desc}));
+    if(a) adsCache=a.map(x=>({...x,descricao:x.descricao||x.desc}));
   }catch(e){ console.error('Falha ao carregar dados do Supabase, a usar dados padrão.', e); }
   renderProjects();
   buildCarousel();
@@ -774,12 +775,17 @@ const saEl=document.getElementById('slide-atual');
 const stEl=document.getElementById('slide-total');
 
 function buildCarousel(){
-  const news=newsCache;
-  if(!news.length){
+  const items=[
+    ...newsCache.filter(n=>n.carrossel===true).map(n=>({...n,tipo:'noticia'})),
+    ...adsCache.filter(a=>a.carrossel===true).map(a=>({...a,resumo:a.descricao||a.desc||'',tipo:'publicidade'}))
+  ].sort((a,b)=>new Date(b.data||b.created_at||0)-new Date(a.data||a.created_at||0));
+  window.carouselItems=items;
+  if(!items.length){
     track.innerHTML='<div style="padding:3rem;color:#aaa;text-align:center;font-size:.9rem">Sem publicações de momento.</div>';
+    dotsEl.innerHTML='';saEl.textContent='0';stEl.textContent='0';
     return;
   }
-  track.innerHTML=news.map(n=>`
+  track.innerHTML=items.map(n=>`
     <article class="noticia-card">
       <div class="n-img">
         <img src="${n.img||'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=70'}" alt="${n.titulo}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=70'">
@@ -789,18 +795,18 @@ function buildCarousel(){
         <p class="n-date">${fmtDate(n.data)}</p>
         <h3 class="n-title">${n.titulo}</h3>
         <p class="n-desc">${n.resumo}</p>
-        <a href="noticias/show.html" class="n-link">Ler mais <i class="fa-solid fa-arrow-right" style="font-size:.6rem"></i></a>
+        <a href="noticias/show.html${n.tipo==='publicidade'?'#publicidades':''}" class="n-link">${n.tipo==='publicidade'?'Ver publicidade':'Ler mais'} <i class="fa-solid fa-arrow-right" style="font-size:.6rem"></i></a>
       </div>
     </article>`).join('');
-  dotsEl.innerHTML=news.map((_,i)=>`<button class="c-dot${i===0?' active':''}" data-i="${i}" aria-label="Slide ${i+1}"></button>`).join('');
+  dotsEl.innerHTML=items.map((_,i)=>`<button class="c-dot${i===0?' active':''}" data-i="${i}" aria-label="Slide ${i+1}"></button>`).join('');
   dotsEl.querySelectorAll('.c-dot').forEach(d=>d.addEventListener('click',()=>goTo(parseInt(d.dataset.i))));
-  stEl.textContent=news.length;
+  stEl.textContent=items.length;
   goTo(0,false);
 }
 
 function goTo(i,anim=true){
-  const news=newsCache;
-  const n=news.length;if(!n)return;
+  const items=window.carouselItems||[];
+  const n=items.length;if(!n)return;
   ci=(i%n+n)%n;
   if(!anim)track.style.transition='none';
   track.style.transform=`translateX(-${ci*100}%)`;

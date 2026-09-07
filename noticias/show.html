@@ -241,6 +241,7 @@ footer .back:hover{color:#fff}
         <button class="catb" data-cat="Edificação">Edificação</button>
         <button class="catb" data-cat="Sustentabilidade">Sustentabilidade</button>
         <button class="catb" data-cat="Institucional">Institucional</button>
+        <button class="catb" data-cat="comercio">Comércio</button>
       </div>
     </div>
   </div>
@@ -374,6 +375,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   }
   observeNew();
 }));
+if(location.hash==='#publicidades') document.querySelector('[data-tab="publicidades"]')?.click();
 
 // ── NOTÍCIAS ──────────────────────────────────────────
 let currentCat='all', currentSearch='', currentArticleId=null;
