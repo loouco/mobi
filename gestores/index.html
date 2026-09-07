@@ -185,6 +185,14 @@ textarea.finp{resize:vertical}
 .fbtn.sec:hover{background:rgba(255,255,255,.1);transform:none}
 .fbtn.danger{background:rgba(220,53,53,.15);color:#ff6b6b;border:1px solid rgba(220,53,53,.25)}
 .fbtn.danger:hover{background:rgba(220,53,53,.25)}
+.upload-control{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;min-height:42px}
+.file-input-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.upload-btn{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.14);text-transform:none;letter-spacing:0;font-size:.76rem}
+.upload-btn:hover{background:var(--v);border-color:var(--v);color:#fff;transform:translateY(-1px)}
+.upload-name{font-size:.7rem;color:rgba(255,255,255,.42);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.upload-preview{width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.12)}
+.check-row{display:flex;align-items:center;gap:.55rem;font-size:.8rem;color:rgba(255,255,255,.72);cursor:pointer;width:max-content}
+.check-row input{accent-color:var(--v);width:16px;height:16px}
 
 /* ITEMS LIST */
 .items-list{display:flex;flex-direction:column;gap:.65rem}
@@ -428,10 +436,11 @@ textarea.finp{resize:vertical}
           <div><label class="flbl" for="nRes">Resumo *</label><textarea class="finp" id="nRes" rows="2" placeholder="Breve descrição para listagem e carrossel..."></textarea></div>
           <div><label class="flbl" for="nContent">Conteúdo completo *</label><textarea class="finp" id="nContent" rows="6" placeholder="Texto completo da notícia..."></textarea></div>
           <div class="fa3">
-            <div><label class="flbl" for="nCat">Categoria</label><select id="nCat" class="finp"><option>Infraestrutura</option><option>Edificação</option><option>Sustentabilidade</option><option>Institucional</option></select></div>
+            <div><label class="flbl" for="nCat">Categoria</label><select id="nCat" class="finp"><option>Infraestrutura</option><option>Edificação</option><option>Sustentabilidade</option><option>Institucional</option><option value="comercio">Comércio</option></select></div>
             <div><label class="flbl" for="nData">Data</label><input type="date" class="finp" id="nData"></div>
-            <div><label class="flbl" for="nImg">Imagem</label><input type="file" accept="image/*" class="finp" id="nImg"></div>
+            <div><span class="flbl">Imagem</span><div class="upload-control"><input type="file" accept="image/*" class="file-input-hidden" id="nImg"><button type="button" class="fbtn upload-btn" data-file-trigger="nImg"><i class="fa-solid fa-image"></i> Escolher imagem</button><img class="upload-preview hid" id="nImgPreview" alt="Pré-visualização da imagem"><span class="upload-name" id="nImgName">Nenhum ficheiro selecionado</span></div></div>
           </div>
+          <label class="check-row" for="nCarrossel"><input type="checkbox" id="nCarrossel"> Adicionar ao carrossel</label>
         </div>
         <div class="row-btns">
           <button class="fbtn" id="nSave"><i class="fa-solid fa-floppy-disk" style="font-size:.68rem"></i> Guardar Notícia</button>
@@ -461,8 +470,9 @@ textarea.finp{resize:vertical}
           </div>
           <div class="fg2">
             <div><label class="flbl" for="aContact">Contacto</label><input class="finp" id="aContact" placeholder="Email ou telefone"></div>
-            <div><label class="flbl" for="aImg">Imagem</label><input type="file" accept="image/*" class="finp" id="aImg"></div>
+            <div><span class="flbl">Imagem</span><div class="upload-control"><input type="file" accept="image/*" class="file-input-hidden" id="aImg"><button type="button" class="fbtn upload-btn" data-file-trigger="aImg"><i class="fa-solid fa-image"></i> Escolher imagem</button><img class="upload-preview hid" id="aImgPreview" alt="Pré-visualização da imagem"><span class="upload-name" id="aImgName">Nenhum ficheiro selecionado</span></div></div>
           </div>
+          <label class="check-row" for="aCarrossel"><input type="checkbox" id="aCarrossel"> Adicionar ao carrossel</label>
         </div>
         <div class="row-btns">
           <button class="fbtn" id="aSave"><i class="fa-solid fa-floppy-disk" style="font-size:.68rem"></i> Guardar Publicidade</button>
@@ -486,15 +496,12 @@ textarea.finp{resize:vertical}
          <div class="form-stack">
           <div><label class="flbl" for="pTit">Título *</label><input class="finp" id="pTit" placeholder="Nome do projeto"></div>
           <div><label class="flbl" for="pDesc">Descrição *</label><textarea class="finp" id="pDesc" rows="3" placeholder="Descrição técnica do projeto..."></textarea></div>
-          <div class="fg2">
-            <div><label class="flbl" for="pCat">Categoria</label><select id="pCat" class="finp"><option value="edificacao">Edificação</option><option value="infraestrutura">Infraestrutura</option><option value="sustentavel">Sustentável</option><option value="industrial">Industrial</option></select></div>
-            <div><label class="flbl" for="pAno">Ano</label><input class="finp" id="pAno" placeholder="ex: 2024" type="number" min="1990" max="2030"></div>
-          </div>
+          <div><label class="flbl" for="pAno">Ano</label><input class="finp" id="pAno" placeholder="ex: 2024" type="number" min="1990" max="2030"></div>
           <div class="fg2">
             <div><label class="flbl" for="pLoc">Localização</label><input class="finp" id="pLoc" placeholder="ex: Luanda, Angola"></div>
-            <div><label class="flbl" for="pDim">Área</label><input class="finp" id="pDim" placeholder="ex: 45.000 m²"></div>
+            <div><label class="flbl" for="pDim">Área</label><select class="finp" id="pDim"><option value="comercio">Comércio Geral</option><option value="construcao">Construção Civil</option><option value="obras-publicas">Obras Públicas</option></select></div>
           </div>
-          <div><label class="flbl" for="pImg">Imagem</label><input type="file" accept="image/*" class="finp" id="pImg"></div>
+          <div><span class="flbl">Imagem</span><div class="upload-control"><input type="file" accept="image/*" class="file-input-hidden" id="pImg"><button type="button" class="fbtn upload-btn" data-file-trigger="pImg"><i class="fa-solid fa-image"></i> Escolher imagem</button><img class="upload-preview hid" id="pImgPreview" alt="Pré-visualização da imagem"><span class="upload-name" id="pImgName">Nenhum ficheiro selecionado</span></div></div>
         </div>
         <div class="row-btns">
           <button class="fbtn" id="pSave"><i class="fa-solid fa-floppy-disk" style="font-size:.68rem"></i> Guardar Projeto</button>
@@ -609,6 +616,27 @@ const DEF_IMG=[
   'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=400&q=60',
   'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=60',
 ];
+const EMPTY_UPLOAD_NAME='Nenhum ficheiro selecionado';
+
+function setImagePreview(inputId,imageUrl='',fileName=''){
+  const preview=document.getElementById(inputId+'Preview');
+  const name=document.getElementById(inputId+'Name');
+  name.textContent=fileName||EMPTY_UPLOAD_NAME;
+  if(imageUrl){preview.src=imageUrl;preview.classList.remove('hid');}
+  else{preview.removeAttribute('src');preview.classList.add('hid');}
+}
+
+document.querySelectorAll('[data-file-trigger]').forEach(button=>{
+  const input=document.getElementById(button.dataset.fileTrigger);
+  button.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{
+    const file=input.files[0];
+    if(!file){setImagePreview(input.id);return;}
+    const reader=new FileReader();
+    reader.addEventListener('load',()=>setImagePreview(input.id,reader.result,file.name));
+    reader.readAsDataURL(file);
+  });
+});
 const catLabel={comercio:'Comércio Geral',construcao:'Construção Civil','obras-publicas':'Obras Públicas'};
 const fD=s=>{try{return new Date(s).toLocaleDateString('pt-PT',{day:'2-digit',month:'long',year:'numeric'});}catch{return s||'';}};
 
@@ -850,6 +878,7 @@ document.getElementById('nSave').addEventListener('click',async()=>{
   const cont=document.getElementById('nContent').value.trim();
   const cat=document.getElementById('nCat').value;
   const dat=document.getElementById('nData').value||new Date().toISOString().slice(0,10);
+  const carrossel=document.getElementById('nCarrossel').checked;
   const fi=document.getElementById('nImg');
   if(!tit||!res||!cont)return toast('Preencha os campos obrigatórios (*)',true);
   btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i> A guardar...';
@@ -857,13 +886,13 @@ document.getElementById('nSave').addEventListener('click',async()=>{
     let img=null;
     if(fi.files[0])img=await EufraDB.uploadImagem(fi.files[0]);
     if(id){
-      const payload={titulo:tit,resumo:res,content:cont,categoria:cat,data:dat};
+      const payload={titulo:tit,resumo:res,content:cont,categoria:cat,data:dat,carrossel};
       if(img)payload.img=img;
       const updated=await EufraDB.update('news',id,payload);
       const idx=newsData.findIndex(n=>String(n.id)===String(id));
       if(idx>-1)newsData[idx]=updated;
     }else{
-      const created=await EufraDB.insert('news',{titulo:tit,resumo:res,content:cont,categoria:cat,img:img||'',data:dat});
+      const created=await EufraDB.insert('news',{titulo:tit,resumo:res,content:cont,categoria:cat,img:img||'',data:dat,carrossel});
       newsData.unshift(created);
     }
     resetNewsForm();renderNewsList();renderOverview();updateBadges();
@@ -880,6 +909,8 @@ window.editNews=function(id){
   document.getElementById('nContent').value=n.content||'';
   document.getElementById('nCat').value=n.categoria;
   document.getElementById('nData').value=n.data||'';
+  document.getElementById('nCarrossel').checked=Boolean(n.carrossel);
+  setImagePreview('nImg',n.img||'',n.img?'Imagem atual':'' );
   document.getElementById('nFormTitle').innerHTML='<i class="fa-solid fa-pen"></i> Editar Notícia';
   document.getElementById('nCan').classList.remove('hid');
   switchPanel('noticias');
@@ -898,6 +929,8 @@ function resetNewsForm(){
   ['nTit','nRes','nContent'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('nData').value=new Date().toISOString().slice(0,10);
   document.getElementById('nImg').value='';
+  document.getElementById('nCarrossel').checked=false;
+  setImagePreview('nImg');
   document.getElementById('nFormTitle').innerHTML='<i class="fa-solid fa-plus"></i> Nova Notícia';
   document.getElementById('nCan').classList.add('hid');
 }
@@ -924,6 +957,7 @@ document.getElementById('aSave').addEventListener('click',async()=>{
   const cat=document.getElementById('aCat').value;
   const preco=document.getElementById('aPreco').value.trim();
   const cont=document.getElementById('aContact').value.trim();
+  const carrossel=document.getElementById('aCarrossel').checked;
   const fi=document.getElementById('aImg');
   if(!tit||!desc)return toast('Preencha os campos obrigatórios (*)',true);
   btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i> A guardar...';
@@ -931,13 +965,13 @@ document.getElementById('aSave').addEventListener('click',async()=>{
     let img=null;
     if(fi.files[0])img=await EufraDB.uploadImagem(fi.files[0]);
     if(id){
-      const payload={titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont};
+      const payload={titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont,carrossel};
       if(img)payload.img=img;
       const updated=await EufraDB.update('ads',id,payload);
       const idx=adsData.findIndex(a=>String(a.id)===String(id));
       if(idx>-1)adsData[idx]=updated;
     }else{
-      const created=await EufraDB.insert('ads',{titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont,img:img||'',data:new Date().toISOString().slice(0,10)});
+      const created=await EufraDB.insert('ads',{titulo:tit,descricao:desc,categoria:cat,preco,contacto:cont,img:img||'',data:new Date().toISOString().slice(0,10),carrossel});
       adsData.unshift(created);
     }
     resetAdForm();renderAdsList();renderOverview();updateBadges();
@@ -954,6 +988,8 @@ window.editAd=function(id){
   document.getElementById('aCat').value=a.categoria;
   document.getElementById('aPreco').value=a.preco||'';
   document.getElementById('aContact').value=a.contacto||'';
+  document.getElementById('aCarrossel').checked=Boolean(a.carrossel);
+  setImagePreview('aImg',a.img||'',a.img?'Imagem atual':'');
   document.getElementById('aFormTitle').innerHTML='<i class="fa-solid fa-pen"></i> Editar Publicidade';
   document.getElementById('aCan').classList.remove('hid');
   switchPanel('publicidades');
@@ -971,6 +1007,8 @@ function resetAdForm(){
   document.getElementById('aId').value='';
   ['aTit','aDesc','aPreco','aContact'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('aImg').value='';
+  document.getElementById('aCarrossel').checked=false;
+  setImagePreview('aImg');
   document.getElementById('aFormTitle').innerHTML='<i class="fa-solid fa-plus"></i> Nova Publicidade';
   document.getElementById('aCan').classList.add('hid');
 }
@@ -994,10 +1032,9 @@ document.getElementById('pSave').addEventListener('click',async()=>{
   const id=document.getElementById('pId').value;
   const tit=document.getElementById('pTit').value.trim();
   const desc=document.getElementById('pDesc').value.trim();
-  const cat=document.getElementById('pCat').value;
+  const cat=document.getElementById('pDim').value;
   const ano=document.getElementById('pAno').value;
   const loc=document.getElementById('pLoc').value.trim();
-  const dim=document.getElementById('pDim').value.trim();
   const fi=document.getElementById('pImg');
   if(!tit||!desc)return toast('Preencha os campos obrigatórios (*)',true);
   btn.disabled=true;const orig=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i> A guardar...';
@@ -1005,13 +1042,13 @@ document.getElementById('pSave').addEventListener('click',async()=>{
     let img=null;
     if(fi.files[0])img=await EufraDB.uploadImagem(fi.files[0]);
     if(id){
-      const payload={titulo:tit,descricao:desc,categoria:cat,ano,local:loc,dim};
+      const payload={titulo:tit,descricao:desc,categoria:cat,ano,local:loc};
       if(img)payload.img=img;
       const updated=await EufraDB.update('projects',id,payload);
       const idx=projectsData.findIndex(p=>String(p.id)===String(id));
       if(idx>-1)projectsData[idx]=updated;
     }else{
-      const created=await EufraDB.insert('projects',{titulo:tit,descricao:desc,categoria:cat,ano,local:loc,dim,img:img||''});
+      const created=await EufraDB.insert('projects',{titulo:tit,descricao:desc,categoria:cat,ano,local:loc,img:img||''});
       projectsData.unshift(created);
     }
     resetProjectForm();renderProjectsList();renderOverview();updateBadges();
@@ -1025,10 +1062,10 @@ window.editProject=function(id){
   document.getElementById('pId').value=p.id;
   document.getElementById('pTit').value=p.titulo;
   document.getElementById('pDesc').value=p.descricao||'';
-  document.getElementById('pCat').value=p.categoria;
+  document.getElementById('pDim').value=p.categoria;
   document.getElementById('pAno').value=p.ano||'';
   document.getElementById('pLoc').value=p.local||'';
-  document.getElementById('pDim').value=p.dim||'';
+  setImagePreview('pImg',p.img||'',p.img?'Imagem atual':'');
   document.getElementById('pFormTitle').innerHTML='<i class="fa-solid fa-pen"></i> Editar Projeto';
   document.getElementById('pCan').classList.remove('hid');
   switchPanel('projetos');
@@ -1044,8 +1081,10 @@ window.deleteProject=async function(id){
 };
 function resetProjectForm(){
   document.getElementById('pId').value='';
-  ['pTit','pDesc','pAno','pLoc','pDim'].forEach(i=>document.getElementById(i).value='');
+  ['pTit','pDesc','pAno','pLoc'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pDim').value='comercio';
   document.getElementById('pImg').value='';
+  setImagePreview('pImg');
   document.getElementById('pFormTitle').innerHTML='<i class="fa-solid fa-plus"></i> Novo Projeto';
   document.getElementById('pCan').classList.add('hid');
 }
