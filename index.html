@@ -289,7 +289,7 @@ textarea.contact-input{resize:none}
 .btn-submit:hover{background:var(--azul);transform:translateY(-2px)}
 .form-success{display:none;text-align:center;padding:1rem;background:rgba(0,137,194,.2);border-radius:10px;color:var(--azul);font-size:.88rem;font-weight:600}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
-.info-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.1rem;transition:background .3s}
+.info-card{display:block;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.1rem;color:inherit;text-decoration:none;transition:background .3s}
 .info-card:hover{background:rgba(255,255,255,.07)}
 .info-card-icon{width:36px;height:36px;border-radius:8px;background:rgba(243,130,31,.25);display:flex;align-items:center;justify-content:center;color:var(--azul);font-size:.85rem;margin-bottom:.7rem}
 .info-card-label{font-size:.62rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em}
@@ -581,12 +581,12 @@ footer .bottom p{font-size:.75rem}
       </div>
       <div class="reveal" style="transition-delay:.12s;display:flex;flex-direction:column;gap:1rem">
         <div class="info-grid">
-          <div class="info-card"><div class="info-card-icon"><i class="fa-solid fa-envelope"></i></div><div class="info-card-label">Email</div><div class="info-card-value">[INSERIR EMAIL]</div></div>
-          <div class="info-card"><div class="info-card-icon"><i class="fa-solid fa-phone"></i></div><div class="info-card-label">Telefone</div><div class="info-card-value">[INSERIR TELEFONE]</div></div>
-          <div class="info-card"><div class="info-card-icon"><i class="fa-solid fa-location-dot"></i></div><div class="info-card-label">Morada</div><div class="info-card-value">[INSERIR MORADA], Angola</div></div>
-          <div class="info-card"><div class="info-card-icon"><i class="fa-solid fa-building"></i></div><div class="info-card-label">NIF</div><div class="info-card-value">[INSERIR NIF]</div></div>
+          <a class="info-card" href="https://mail.google.com/mail/?view=cm&fs=1&to=eufratungoscomercioservicos@gmail.com" target="_blank" rel="noopener"><div class="info-card-icon"><i class="fa-solid fa-envelope"></i></div><div class="info-card-label">Email</div><div class="info-card-value">eufratungoscomercioservicos@gmail.com</div></a>
+          <a class="info-card" href="tel:+244926541666"><div class="info-card-icon"><i class="fa-solid fa-phone"></i></div><div class="info-card-label">Telefone</div><div class="info-card-value">926 541 666</div></a>
+          <a class="info-card" href="https://maps.app.goo.gl/U3iyoLooyDp8Lnpb8" target="_blank" rel="noopener"><div class="info-card-icon"><i class="fa-solid fa-location-dot"></i></div><div class="info-card-label">Morada</div><div class="info-card-value">Rua D, Bairro Popular, nº 1, depois do Comando da Polícia Nacional, Uíge, Angola</div></a>
+          <a class="info-card" href="https://wa.me/244926541666" target="_blank" rel="noopener"><div class="info-card-icon"><i class="fa-brands fa-whatsapp"></i></div><div class="info-card-label">WhatsApp</div><div class="info-card-value">926 541 666</div></a>
         </div>
-        <div class="map-wrap" style="display:grid;place-items:center;padding:2rem;text-align:center;color:var(--pedra)"><i class="fa-solid fa-map-location-dot" style="font-size:1.6rem;color:var(--azul);margin-bottom:.6rem"></i><p>Mapa disponível após a confirmação da morada.</p></div>
+        <div class="map-wrap"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3249.1364603509996!2d15.057708474028729!3d-7.6211395753509!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1a48ad85b6f20219%3A0xc143f8e1491f7684!2sEUFRATUNGOS%20LDA%2C%20COMERCIO%20E%20SERVI%C3%87OS!5e1!3m2!1spt-PT!2sao!4v1788743157175!5m2!1spt-PT!2sao" style="border:0;width:100%;height:100%" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="Localização Eufratungos, Lda"></iframe></div>
       </div>
     </div>
   </div>
@@ -645,9 +645,9 @@ footer .bottom p{font-size:.75rem}
       <div class="footer-col">
         <h4>Sede</h4>
         <div class="footer-contact">
-          <div class="fci"><i class="fa-solid fa-location-dot"></i><span>[INSERIR MORADA]<br>Angola</span></div>
-          <div class="fci"><i class="fa-solid fa-envelope"></i><a href="#">[INSERIR EMAIL]</a></div>
-          <div class="fci"><i class="fa-solid fa-phone"></i><a href="#">[INSERIR TELEFONE]</a></div>
+          <div class="fci"><i class="fa-solid fa-location-dot"></i><span>Rua D, Bairro Popular, nº 1, depois do Comando da Polícia Nacional, Uíge, Angola</span></div>
+          <div class="fci"><i class="fa-solid fa-envelope"></i><a href="https://mail.google.com/mail/?view=cm&fs=1&to=eufratungoscomercioservicos@gmail.com" target="_blank" rel="noopener">eufratungoscomercioservicos@gmail.com</a></div>
+          <div class="fci"><i class="fa-solid fa-phone"></i><a href="tel:+244926541666">926 541 666</a></div>
         </div>
       </div>
     </div>
@@ -835,11 +835,19 @@ buildCarousel();
 document.getElementById('formulario-contacto')?.addEventListener('submit',function(e){
   e.preventDefault();
   const btn=document.getElementById('btn-enviar'),ok=document.getElementById('form-success');
+  const campos=[
+    ['Empresa/Entidade',this.querySelector('input[placeholder="A sua empresa..."]').value.trim()],
+    ['Pessoa de Contacto',this.querySelector('input[placeholder="O seu nome..."]').value.trim()],
+    ['Email',this.querySelector('input[type="email"]').value.trim()],
+    ['Telefone',this.querySelector('input[type="tel"]').value.trim()],
+    ['Detalhes do Projecto',this.querySelector('textarea').value.trim()]
+  ];
+  const mensagem=['Olá, Eufratungos! Gostaria de pedir um orçamento.',...campos.filter(([,valor])=>valor).map(([rotulo,valor])=>`${rotulo}: ${valor}`)].join('\n');
+  const url=`https://wa.me/244926541666?text=${encodeURIComponent(mensagem)}`;
   btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> A enviar...';
-  setTimeout(()=>{
-    btn.classList.add('hidden');ok.style.display='block';this.reset();
-    setTimeout(()=>{btn.classList.remove('hidden');ok.style.display='none';btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane"></i> Enviar Mensagem';},5000);
-  },1200);
+  window.open(url,'_blank');
+  btn.classList.add('hidden');ok.style.display='block';this.reset();
+  setTimeout(()=>{btn.classList.remove('hidden');ok.style.display='none';btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane"></i> Enviar Mensagem';},5000);
 });
 
 })();
