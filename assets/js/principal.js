@@ -1,5 +1,5 @@
 /* ===========================================
-   RPP ENGENHARIA – principal.js
+   Eufratungos ENGENHARIA – principal.js
    =========================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ──────────────────────────────────────────
      6. NOTÍCIAS – CRUD + Carrossel
   ────────────────────────────────────────── */
-  const STORAGE_KEY   = 'rpp_publicacoes';
-  const ADMIN_PASS    = 'rpp2026';
+  const STORAGE_KEY   = 'eufratungos_publicacoes';
+  const ADMIN_PASS    = '[INSERIR PALAVRA-PASSE]';
   const CARDS_POR_PAG = getCardsPerPage();
 
   function getCardsPerPage() {
@@ -123,30 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Publicações padrão ──
   const publicacoesDefault = [
-    {
-      id: crypto.randomUUID(),
-      titulo: 'Conclusão da Ponte Industrial Norte',
-      resumo: 'A RPP concluiu mais uma ponte estratégica com 1,8 km e soluções de segurança sísmica de referência internacional.',
-      categoria: 'Infraestrutura',
-      imagem: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=800&q=80',
-      data: '2026-02-12'
-    },
-    {
-      id: crypto.randomUUID(),
-      titulo: 'Novo Centro Logístico em Luanda',
-      resumo: 'Projeto de 35.000 m² com eficiência energética de última geração, automação inteligente e redução de custos operacionais.',
-      categoria: 'Edificação',
-      imagem: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-      data: '2026-01-25'
-    },
-    {
-      id: crypto.randomUUID(),
-      titulo: 'Programa de Construção Sustentável',
-      resumo: 'Nova iniciativa da RPP com metas ambientais concretas: redução de emissões em 40% nas próximas obras da empresa.',
-      categoria: 'Sustentabilidade',
-      imagem: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=800&q=80',
-      data: '2026-01-10'
-    }
+    {id: crypto.randomUUID(), titulo: 'Bem-vindo ao novo site da Eufratungos', resumo: 'Este espaço receberá informações institucionais e novidades verificadas da empresa.', categoria: 'Institucional', imagem: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80', data: ''}
   ];
 
   // ── Storage helpers ──
@@ -414,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         navLinks.forEach(a => {
           a.style.color = '';
           if (a.getAttribute('href') === `#${id}`) {
-            a.style.color = 'var(--ouro)';
+            a.style.color = 'var(--laranja)';
           }
           
         });
