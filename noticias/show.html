@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notícias & Publicidades – RPP Engenharia</title>
+<title>Notícias – Eufratungos, Lda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{--v:#0D4A33;--vm:#16694A;--vl:#1E8A62;--o:#C49A3C;--ol:#D9B55A;--c:#111110;--cm:#1C1C1A;--cr:#F5F1EA;--b:#FAFAF8;--ease:cubic-bezier(.16,1,.3,1)}
+:root{--preto:#141414;--laranja:#F3821F;--laranja-lt:#FFA24D;--azul:#00ADF1;--azul-md:#0089C2;--osso:#F7F5F1;--branco:#FFFFFF;--pedra:#6B6B68;--pedra-lt:#A7A5A0;--v:var(--laranja);--vm:var(--azul-md);--vl:var(--azul);--o:var(--laranja);--ol:var(--laranja-lt);--c:var(--preto);--cm:var(--preto);--cr:var(--osso);--b:var(--branco);--ease:cubic-bezier(.16,1,.3,1)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Outfit',sans-serif;color:var(--c);background:var(--b);overflow-x:hidden}
@@ -19,7 +19,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--v);border-radius:4px}
 
 /* HEADER */
-header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(196,154,60,.12)}
+header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(243,130,31,.12)}
 .hw{max-width:1320px;margin:0 auto;padding:.9rem 1.5rem;display:flex;justify-content:space-between;align-items:center}
 @media(min-width:768px){.hw{padding:.95rem 2.5rem}}
 .lw{display:flex;align-items:center;gap:.6rem}
@@ -43,7 +43,7 @@ header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;
 .ey{display:flex;align-items:center;gap:.7rem;margin-bottom:.9rem}
 .ey .r{height:1px;width:26px;background:var(--o);flex-shrink:0}
 .ey span{font-size:.64rem;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:var(--o)}
-.hero-t{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2.4rem,5.5vw,4.8rem);color:#fff;line-height:.95;margin-top:.5rem}
+.hero-t{font-family:'Archivo Black',sans-serif;font-weight:900;font-size:clamp(2.4rem,5.5vw,4.8rem);color:#fff;line-height:.95;margin-top:.5rem}
 .hero-sub{color:rgba(255,255,255,.5);font-size:.93rem;line-height:1.72;max-width:500px;margin-top:1rem}
 
 /* TABS */
@@ -61,7 +61,7 @@ header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;
 .search-wrap{position:relative;flex:1;max-width:380px}
 .search-wrap i{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:#aaa;font-size:.78rem;pointer-events:none}
 #searchInput{width:100%;background:#fff;border:1px solid #E8E4DB;border-radius:8px;padding:.6rem .9rem .6rem 2.3rem;font-family:'Outfit',sans-serif;font-size:.85rem;color:var(--c);outline:none;transition:border-color .3s,box-shadow .3s}
-#searchInput:focus{border-color:var(--v);box-shadow:0 0 0 3px rgba(13,74,51,.08)}
+#searchInput:focus{border-color:var(--v);box-shadow:0 0 0 3px rgba(243,130,31,.08)}
 .cats{display:flex;flex-wrap:wrap;gap:.38rem}
 .catb{border:1px solid #E8E4DB;color:#888;font-size:.67rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.36rem .82rem;border-radius:100px;transition:all .3s;background:#fff}
 .catb:hover{border-color:var(--v);color:var(--v)}
@@ -86,7 +86,7 @@ header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;
 .ncat-badge{position:absolute;bottom:.8rem;left:.8rem;background:var(--v);color:#fff;font-size:.57rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:.27rem .7rem;border-radius:100px}
 .ncard-body{padding:1.5rem 1.6rem 1.8rem;display:flex;flex-direction:column;flex:1}
 .ndate{font-size:.68rem;color:#bbb;margin-bottom:.55rem;letter-spacing:.07em}
-.ntit{font-family:'Playfair Display',serif;font-size:clamp(1.05rem,1.8vw,1.3rem);font-weight:700;color:var(--c);line-height:1.3}
+.ntit{font-family:'Archivo Black',sans-serif;font-size:clamp(1.05rem,1.8vw,1.3rem);font-weight:700;color:var(--c);line-height:1.3}
 .nresume{font-size:.85rem;color:#777;line-height:1.72;margin-top:.65rem;flex:1}
 .nlink{display:inline-flex;align-items:center;gap:.4rem;font-size:.74rem;font-weight:600;color:var(--v);margin-top:1.2rem;transition:gap .3s;background:none;border:none;padding:0;text-align:left}
 .nlink:hover{gap:.72rem}
@@ -106,8 +106,8 @@ header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;
 #articleView.show{display:block}
 .art-back{display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--v);font-weight:600;margin-bottom:2rem;transition:gap .3s}
 .art-back:hover{gap:.8rem}
-.art-cat{display:inline-flex;align-items:center;background:rgba(13,74,51,.08);color:var(--v);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:.3rem .8rem;border-radius:100px;margin-bottom:.9rem}
-.art-title{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.8rem,4vw,3rem);line-height:1.15;color:var(--c)}
+.art-cat{display:inline-flex;align-items:center;background:rgba(243,130,31,.08);color:var(--v);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:.3rem .8rem;border-radius:100px;margin-bottom:.9rem}
+.art-title{font-family:'Archivo Black',sans-serif;font-weight:900;font-size:clamp(1.8rem,4vw,3rem);line-height:1.15;color:var(--c)}
 .art-meta{display:flex;align-items:center;gap:1rem;margin-top:1rem;font-size:.8rem;color:#bbb;flex-wrap:wrap}
 .art-meta i{font-size:.72rem;color:var(--o)}
 .art-img{width:100%;height:380px;object-fit:cover;border-radius:16px;margin:2rem 0;box-shadow:0 20px 60px rgba(0,0,0,.12)}
@@ -159,7 +159,7 @@ header{background:rgba(17,17,16,.97);backdrop-filter:blur(24px);position:sticky;
 #adMclose{position:absolute;top:.9rem;right:.9rem;z-index:1;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.32);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.82rem;transition:background .3s}
 #adMclose:hover{background:rgba(255,255,255,.14)}
 .mtw{position:absolute;bottom:1.4rem;left:2rem;z-index:1}
-#adMTitle{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,3vw,2rem);font-weight:900;color:#fff}
+#adMTitle{font-family:'Archivo Black',sans-serif;font-size:clamp(1.3rem,3vw,2rem);font-weight:900;color:#fff}
 .mbd{padding:1.8rem}
 @media(min-width:700px){.mbd{display:grid;grid-template-columns:3fr 2fr;gap:2rem;padding:2.4rem}}
 .mdl{font-size:.64rem;color:#aaa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.72rem}
@@ -193,10 +193,10 @@ footer .back:hover{color:#fff}
   <div class="hw">
     <a href="../index.html" class="lw">
       <div class="lm">
-        <img src="../assets/imagens/logo.jpeg" alt="RPP" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <span class="lm-txt" style="display:none">RPP</span>
+        <img src="../assets/imagens/logo.jpg" alt="Logótipo Eufratungos" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="lm-txt" style="display:none">Eufratungos, Lda</span>
       </div>
-      <div><span class="ln">RPP</span><span class="lt">Engenharia & Construção</span></div>
+      <div><span class="ln">Eufratungos, Lda</span><span class="lt">Comércio · Serviços · Construção</span></div>
     </a>
     <a href="../index.html#contacto" class="hbtn"><i class="fa-solid fa-paper-plane" style="font-size:.64rem"></i> Solicitar Proposta</a>
   </div>
@@ -208,11 +208,11 @@ footer .back:hover{color:#fff}
     <nav class="bc">
       <a href="../index.html"><i class="fa-solid fa-house" style="font-size:.7rem"></i> Início</a>
       <span class="sep">/</span>
-      <span style="color:rgba(255,255,255,.65)" id="heroLabel">Notícias & Publicidades</span>
+      <span style="color:rgba(255,255,255,.65)" id="heroLabel">Notícias</span>
     </nav>
-    <div class="ey"><div class="r"></div><span>Atualizações RPP</span></div>
-    <h1 class="hero-t">Notícias &<br>Publicidades</h1>
-    <p class="hero-sub">Acompanhe as últimas notícias e descubra as nossas oportunidades e espaços publicitários disponíveis.</p>
+    <div class="ey"><div class="r"></div><span>Atualizações</span></div>
+    <h1 class="hero-t">Notícias &<br>Informações</h1>
+    <p class="hero-sub">Este espaço será actualizado com notícias e informações institucionais verificadas da Eufratungos.</p>
   </div>
 </div>
 
@@ -220,7 +220,7 @@ footer .back:hover{color:#fff}
 <div class="tabs-bar" id="tabsBar">
   <div class="tabs-inner">
     <button class="tab a" data-tab="noticias"><i class="fa-solid fa-newspaper" style="margin-right:.4rem;font-size:.75rem"></i>Notícias</button>
-    <button class="tab" data-tab="publicidades"><i class="fa-solid fa-bullhorn" style="margin-right:.4rem;font-size:.75rem"></i>Publicidades</button>
+    <button class="tab" data-tab="publicidades"><i class="fa-solid fa-bullhorn" style="margin-right:.4rem;font-size:.75rem"></i>Informações</button>
   </div>
 </div>
 
@@ -263,7 +263,7 @@ footer .back:hover{color:#fff}
     <div class="art-share">
       <span>Partilhar:</span>
       <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-      <a href="#" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="https://www.facebook.com/Eufratungos/" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
       <a href="#" title="Twitter/X"><i class="fa-brands fa-x-twitter"></i></a>
       <a href="#" title="Copiar link" id="copyLink"><i class="fa-solid fa-link"></i></a>
     </div>
@@ -305,36 +305,29 @@ footer .back:hover{color:#fff}
 
 <footer>
   <div class="fw">
-    <p>© 2026 RPP – Engenharia e Construção Civil, LDA. Todos os direitos reservados.</p>
+    <p>© 2026 Eufratungos, Lda. Todos os direitos reservados.</p>
     <a href="../index.html" class="back"><i class="fa-solid fa-arrow-left" style="font-size:.7rem"></i> Voltar ao Início</a>
   </div>
 </footer>
 
 <script>
 /* =====================================================
-   RPP ENGENHARIA – noticias/show.html
+   EUFRATUNGOS, LDA – noticias/show.html
    Chaves localStorage unificadas:
-     rpp_news     → notícias
-     rpp_ads      → publicidades
-     rpp_ads_imgs → imagens publicidades (base64)
+     eufratungos_news     → notícias
+     eufratungos_ads      → publicidades
+     eufratungos_ads_imgs → imagens publicidades (base64)
    ===================================================== */
 (()=>{
 'use strict';
 
-const KEYS={news:'rpp_news',ads:'rpp_ads',adsImgs:'rpp_ads_imgs'};
+const KEYS={news:'eufratungos_news',ads:'eufratungos_ads',adsImgs:'eufratungos_ads_imgs'};
 
 const DEF_NEWS=[
-  {id:'n1',titulo:'RPP conclui obra de referência em Luanda',resumo:'A empresa entregou mais um projeto de excelência dentro do prazo e orçamento previstos, reforçando a sua posição como líder no mercado angolano.',content:'A RPP Engenharia concluiu com sucesso mais uma obra de referência em Luanda. O projeto foi entregue dentro do prazo e do orçamento previstos, demonstrando a capacidade técnica e organizacional da empresa.\n\nA obra envolveu uma equipa multidisciplinar de mais de 120 profissionais e incorporou as mais recentes tecnologias de construção sustentável.\n\nO cliente manifestou total satisfação com os resultados obtidos, destacando a qualidade de execução e a eficiência na gestão do projeto.',categoria:'Institucional',data:'2024-03-15',img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=900&q=70'},
-  {id:'n2',titulo:'Novo contrato de infraestrutura no Norte de Angola',resumo:'RPP assinou contrato para construção de rede rodoviária de 85 km em Malanje, num dos maiores projetos de infraestrutura do país.',content:'A RPP Engenharia assinou um contrato de grande envergadura para a construção de uma rede rodoviária de 85 km na província de Malanje.\n\nO projeto inclui a construção de 4 pontes, sistemas de drenagem avançados e sinalização inteligente. A execução está prevista para 24 meses.\n\nEsta obra vai melhorar significativamente a conectividade da região Norte de Angola, beneficiando centenas de milhares de habitantes.',categoria:'Infraestrutura',data:'2024-02-10',img:'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=900&q=70'},
-  {id:'n3',titulo:'Certificação ISO 14001 renovada com distinção',resumo:'A RPP renovou com sucesso a certificação ambiental ISO 14001, reforçando o compromisso com a sustentabilidade.',content:'A RPP Engenharia renovou com distinção a sua certificação ISO 14001, que atesta o compromisso da empresa com a gestão ambiental responsável.\n\nA auditoria destacou as melhorias implementadas nos processos de gestão de resíduos, redução de emissões e uso eficiente de recursos.',categoria:'Sustentabilidade',data:'2024-01-22',img:'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=900&q=70'},
-  {id:'n4',titulo:'Expansão para o mercado europeu',resumo:'Com a abertura de escritório em Lisboa, a RPP consolida a sua presença internacional e abre portas para projetos em Portugal e Espanha.',content:'A RPP Engenharia confirmou a abertura de um novo escritório em Lisboa, marcando o início da sua expansão para o mercado europeu.\n\nA presença em Portugal permitirá à empresa concorrer a projetos de grande envergadura em Portugal, Espanha e outros países da União Europeia.',categoria:'Institucional',data:'2024-04-05',img:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=70'},
+  {id:'n1',titulo:'Bem-vindo ao novo site da Eufratungos',resumo:'Este espaço receberá informações institucionais e novidades verificadas da empresa.',content:'Bem-vindo ao site da Eufratungos, Lda. As notícias serão adicionadas à medida que exista informação institucional confirmada.',categoria:'Institucional',data:'',img:'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=70'},
 ];
 
-const DEF_ADS=[
-  {id:'a1',titulo:'Patrocínio de Eventos RPP',descricao:'Associe a sua marca aos maiores eventos de engenharia civil organizados pela RPP. Visibilidade garantida para decisores de topo.',categoria:'Patrocínio',preco:'A partir de 3.500 USD',contacto:'eventos@rppengenharia.com',data:'2024-03-01'},
-  {id:'a2',titulo:'Espaço Publicitário Digital',descricao:'Banner premium no site e newsletter mensal com mais de 8.000 profissionais do sector. Formatos desktop e mobile.',categoria:'Digital',preco:'1.200 USD/mês',contacto:'marketing@rppengenharia.com',data:'2024-02-15'},
-  {id:'a3',titulo:'Parceria Comercial Estratégica',descricao:'Programa de parceria para fornecedores e subcontratados. Inclui co-branding e presença em reuniões com clientes finais.',categoria:'Parceria',preco:'Sob consulta',contacto:'parcerias@rppengenharia.com',data:'2024-01-10'},
-];
+const DEF_ADS=[];
 
 const DEF_IMG_FALLBACKS=[
   'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=70',
@@ -428,7 +421,7 @@ function openArticle(id){
   document.getElementById('artImg').src=img;
   document.getElementById('artImg').alt=n.titulo;
   document.getElementById('artBody').textContent=n.content||n.resumo;
-  document.getElementById('artTags').innerHTML=`<span class="art-tag">${n.categoria}</span><span class="art-tag">Construção</span><span class="art-tag">RPP</span>`;
+  document.getElementById('artTags').innerHTML=`<span class="art-tag">${n.categoria}</span><span class="art-tag">Construção</span><span class="art-tag">Eufratungos, Lda</span>`;
 
   // Prev / Next
   const idx=all.findIndex(x=>String(x.id)===String(id));
