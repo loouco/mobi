@@ -265,9 +265,9 @@ footer .back:hover{color:#fff}
     <div class="art-tags" id="artTags"></div>
     <div class="art-share">
       <span>Partilhar:</span>
-      <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-      <a href="https://www.facebook.com/Eufratungos/" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-      <a href="#" title="Twitter/X"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="#" target="_blank" rel="noopener" title="LinkedIn" id="shareLinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      <a href="#" target="_blank" rel="noopener" title="Facebook" id="shareFacebook"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="#" target="_blank" rel="noopener" title="Twitter/X" id="shareTwitter"><i class="fa-brands fa-x-twitter"></i></a>
       <a href="#" title="Copiar link" id="copyLink"><i class="fa-solid fa-link"></i></a>
     </div>
     <div class="art-nav" id="artNav"></div>
@@ -379,6 +379,8 @@ if(location.hash==='#publicidades') document.querySelector('[data-tab="publicida
 
 // ── NOTÍCIAS ──────────────────────────────────────────
 let currentCat='all', currentSearch='', currentArticleId=null;
+const hid=location.hash.slice(1);
+if(hid && lN().some(n=>String(n.id)===hid)) openArticle(hid);
 
 function getFiltered(){
   return lN().filter(n=>{
@@ -420,6 +422,11 @@ function openArticle(id){
   const n=all.find(x=>x.id===id||String(x.id)===String(id));
   if(!n)return;
   currentArticleId=id;
+  history.replaceState(null, '', '#'+id);
+  const shareUrl=location.origin+location.pathname+'#'+id;
+  document.getElementById('shareLinkedIn').href='https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(shareUrl);
+  document.getElementById('shareFacebook').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(shareUrl);
+  document.getElementById('shareTwitter').href='https://twitter.com/intent/tweet?url='+encodeURIComponent(shareUrl)+'&text='+encodeURIComponent(n.titulo);
   const img=n.img||DEF_IMG_FALLBACKS[0];
 
   document.getElementById('artCat').textContent=n.categoria;
@@ -454,6 +461,7 @@ function closeArticle(){
   document.getElementById('heroSection').classList.remove('hid');
   document.getElementById('tabsBar').classList.remove('hid');
   currentArticleId=null;
+  history.replaceState(null, '', location.pathname);
 }
 
 document.getElementById('artBack').addEventListener('click',()=>{
@@ -463,7 +471,15 @@ document.getElementById('artBack').addEventListener('click',()=>{
 
 document.getElementById('copyLink').addEventListener('click',e=>{
   e.preventDefault();
-  navigator.clipboard?.writeText(location.href+(currentArticleId?'#'+currentArticleId:''));
+  const shareUrl=location.origin+location.pathname+'#'+currentArticleId;
+  navigator.clipboard?.writeText(shareUrl);
+  const copyLink=e.currentTarget, icon=copyLink.querySelector('i');
+  copyLink.title='Copiado!';
+  icon.className='fa-solid fa-check';
+  setTimeout(()=>{
+    copyLink.title='Copiar link';
+    icon.className='fa-solid fa-link';
+  },1500);
 });
 
 // Search + filter
